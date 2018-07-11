@@ -2,5 +2,6 @@
 name = "deltae"
 version = "0.1.0"
 authors = ["Ryan O'Beirne <ryanobeirne@gmail.com>"]
+description = "Calculate Delta E between two colors."
 
 [dependencies]
