@@ -14,9 +14,10 @@ struct LchValue {
 }
 
 fn lab_to_lch(color: &LabValue) -> LchValue {
+    let max_c = (2_f64 * 128_f64.powi(2)).sqrt();
     LchValue {
         l: color.l,
-        c: ( color.a.powi(2) + color.b.powi(2) ).sqrt(),
+        c: ( color.a.powi(2) + color.b.powi(2) ).sqrt() / max_c * 100_f64,
         h: color.b,        
     }
 }
@@ -48,8 +49,11 @@ fn main() {
     let delta_e = delta_e_1976(&color0, &color1);
     println!("{:?}", delta_e);
 
-    let lch = lab_to_lch(&color2);
-    println!("{:?}", lch);
+    let lch0 = lab_to_lch(&color0);
+    println!("{:?}", lch0);
+
+    let lch1 = lab_to_lch(&color2);
+    println!("{:?}", lch1);
 
 }
 
