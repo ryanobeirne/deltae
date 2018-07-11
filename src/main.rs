@@ -14,11 +14,17 @@ struct LchValue {
 }
 
 fn lab_to_lch(color: &LabValue) -> LchValue {
-    let max_c = (2_f64 * 128_f64.powi(2)).sqrt();
+
+    let mut h: f64 = color.b.atan2(color.a).to_degrees();
+
+    if h < 0_f64 {
+        h = 360_f64 - h.abs();
+    };
+
     LchValue {
         l: color.l,
-        c: ( color.a.powi(2) + color.b.powi(2) ).sqrt() / max_c * 100_f64,
-        h: color.b,        
+        c: ( color.a.powi(2) + color.b.powi(2) ).sqrt(),
+        h: h % 360_f64,
     }
 }
 
