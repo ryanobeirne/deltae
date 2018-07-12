@@ -33,7 +33,7 @@ fn delta_e_1976(c1: &LabValue, c2: &LabValue) -> f64 {
     ( (c1.l - c2.l).powi(2) + (c1.a - c2.a).powi(2) + (c1.b - c2.b).powi(2) ).sqrt()
 }
 
-fn string_to_lab(lab_string: String) -> LabValue {
+fn string_to_lab(lab_string: &String) -> LabValue {
     let split = lab_string.split(",").filter_map(|s| s.parse::<f64>().ok()).collect::<Vec<_>>();
     if split.len() != 3 {
         eprintln!("Bad Lab values format: '{}'. Use 'L,a,b'", lab_string);
@@ -59,8 +59,8 @@ fn main() {
 
     let de_method = matches.value_of("METHOD").unwrap_or("de1976");
     eprintln!("Delta E Method: {}", de_method);
-    let color0 = string_to_lab( String::from( matches.value_of("COLOR0").unwrap() ) );
-    let color1 = string_to_lab( String::from( matches.value_of("COLOR1").unwrap() ) );
+    let color0 = string_to_lab( &String::from( matches.value_of("COLOR0").unwrap() ) );
+    let color1 = string_to_lab( &String::from( matches.value_of("COLOR1").unwrap() ) );
 
     let delta_e = format!("{:.*}", 2, delta_e_1976(&color0, &color1));
     println!("{}", delta_e);
