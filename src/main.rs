@@ -36,9 +36,15 @@ fn delta_e_1976(c1: &LabValue, c2: &LabValue) -> f64 {
 fn string_to_lab(lab_string: &String) -> LabValue {
     let split = lab_string.split(",").filter_map(|s| s.parse::<f64>().ok()).collect::<Vec<_>>();
     if split.len() != 3 {
-        eprintln!("Bad Lab values format: '{}'. Use 'L,a,b'", lab_string);
+        eprintln!("Bad Lab values format: '{}'.\n\tUse 'L,a,b'", lab_string);
         std::process::exit(1);
     };
+    if  split[0] < 0_f64 || split[0] > 100_f64 ||
+        split[1] < -128_f64 || split[1] > 128_f64 ||
+        split[2] < -128_f64 || split[2] > 128_f64 {
+            eprintln!("Bad Lab values: {}\n\tL: 0..100\n\ta: -128..128\n\tb: -128..128", lab_string);
+            std::process::exit(1);
+        }
     LabValue {
         l: split[0],
         a: split[1],
@@ -64,25 +70,6 @@ fn main() {
 
     let delta_e = format!("{:.*}", 2, delta_e_1976(&color0, &color1));
     println!("{}", delta_e);
-
-    //TODO: Move this to a test
-    //let color2 = LabValue {
-        //l: 50.0,
-        //a: 100.0,
-        //b: 100.0,
-    //};
-
-    //let color3 = LabValue {
-        //l: 50.0,
-        //a: -100.0,
-        //b: -100.0,
-    //};
-
-    //let lch0 = lab_to_lch(&color2);
-    //println!("{:?}", lch0);
-
-    //let lch1 = lab_to_lch(&color3);
-    //println!("{:?}", lch1);
 
 }
 
