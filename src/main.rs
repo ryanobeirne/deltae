@@ -1,3 +1,5 @@
+#[macro_use]
+extern crate clap;
 
 #[derive(Debug)]
 struct LabValue {
@@ -14,7 +16,6 @@ struct LchValue {
 }
 
 fn lab_to_lch(color: &LabValue) -> LchValue {
-
     let mut h: f64 = color.b.atan2(color.a).to_degrees();
 
     if h < 0_f64 {
@@ -32,34 +33,56 @@ fn delta_e_1976(c1: &LabValue, c2: &LabValue) -> f64 {
     ( (c1.l - c2.l).powi(2) + (c1.a - c2.a).powi(2) + (c1.b - c2.b).powi(2) ).sqrt()
 }
 
+fn string_to_lab(lab_string: String) -> LabValue {
+    let split = lab_string.split(",").filter_map(|s| s.parse::<f64>().ok()).collect::<Vec<_>>();
+    if split.len() != 3 {
+        eprintln!("Bad Lab values format: '{}'. Use 'L,a,b'", lab_string);
+        std::process::exit(1);
+    };
+    LabValue {
+        l: split[0],
+        a: split[1],
+        b: split[2],
+    }
+}
+
 fn main() {
 
-    let color0 = LabValue {
-        l: 95.08,
-        a: -0.17,
-        b: -10.81,
-    };
+    let matches = clap_app!(deltae =>
+        (version: crate_version!())
+        (author: crate_authors!())
+        (about: crate_description!())
+        (@arg METHOD: -m --method +takes_value "Sets delta E method (1976, 2000, CMC1, CMC2). Default is dE1976")
+        (@arg COLOR0: +required "Lab values for reference color: (98.08,-0.17,-10.81)")
+        (@arg COLOR1: +required "Lab values for comparison color: (89.73,1.88,-6.96)")
+    ).get_matches();
 
-    let color1 = LabValue {
-        l: 89.73,
-        a: 1.88,
-        b: -6.96,
-    };
+    let de_method = matches.value_of("METHOD").unwrap_or("de1976");
+    eprintln!("Delta E Method: {}", de_method);
+    let color0 = string_to_lab( String::from( matches.value_of("COLOR0").unwrap() ) );
+    let color1 = string_to_lab( String::from( matches.value_of("COLOR1").unwrap() ) );
 
-    let color2 = LabValue {
-        l: 50.0,
-        a: 100.0,
-        b: 100.0,
-    };
+    let delta_e = format!("{:.*}", 2, delta_e_1976(&color0, &color1));
+    println!("{}", delta_e);
 
-    let delta_e = delta_e_1976(&color0, &color1);
-    println!("{:?}", delta_e);
+    //TODO: Move this to a test
+    //let color2 = LabValue {
+        //l: 50.0,
+        //a: 100.0,
+        //b: 100.0,
+    //};
 
-    let lch0 = lab_to_lch(&color0);
-    println!("{:?}", lch0);
+    //let color3 = LabValue {
+        //l: 50.0,
+        //a: -100.0,
+        //b: -100.0,
+    //};
 
-    let lch1 = lab_to_lch(&color2);
-    println!("{:?}", lch1);
+    //let lch0 = lab_to_lch(&color2);
+    //println!("{:?}", lch0);
+
+    //let lch1 = lab_to_lch(&color3);
+    //println!("{:?}", lch1);
 
 }
 

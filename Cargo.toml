@@ -5,3 +5,4 @@ authors = ["Ryan O'Beirne <ryanobeirne@gmail.com>"]
 description = "Calculate Delta E between two colors."
 
 [dependencies]
+clap = "2.32.0"
