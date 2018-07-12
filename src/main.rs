@@ -71,15 +71,29 @@ fn main() {
     ).get_matches();
 
     //Select the desired dE method or use de1976 by default
-    let de_method = matches.value_of("METHOD").unwrap_or("de1976");
-    eprintln!("Delta E Method: {}", de_method);
+    let arg_method = matches.value_of("METHOD").unwrap_or("de1976");
+    eprintln!("Delta E Method: {}", arg_method);
+
+    //Decide which delta e method to use
+    fn de_by_method(color0: &LabValue, color1: &LabValue, method: &str) -> f64 {
+        match method {
+            "de1976" => delta_e_1976(&color0, &color1),
+            //"de2000",
+            //"deCMC1",
+            //"deCMC2",
+            _ => {
+              eprintln!("'{}' is not a valid Delta E method. Using de1976.", method);
+              delta_e_1976(&color0, &color1)
+            },
+        }
+    }
 
     //Parse the arguments into LabValues
     let color0 = string_to_lab( &String::from( matches.value_of("COLOR0").unwrap() ) );
     let color1 = string_to_lab( &String::from( matches.value_of("COLOR1").unwrap() ) );
 
     //Calculate and format dE to 2 decimal places
-    let delta_e = format!("{:.*}", 2, delta_e_1976(&color0, &color1));
+    let delta_e = format!("{:.*}", 2, de_by_method(&color0, &color1, &arg_method));
     println!("{}", delta_e);
 
 }
