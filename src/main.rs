@@ -59,6 +59,20 @@ fn string_to_lab(lab_string: &String) -> LabValue {
     }
 }
 
+//Decide which delta e method to use
+fn de_by_method(color0: &LabValue, color1: &LabValue, method: &str) -> f64 {
+    match method {
+        "de1976" => delta_e_1976(&color0, &color1),
+        //"de2000",
+        //"deCMC1",
+        //"deCMC2",
+        _ => {
+          eprintln!("'{}' is not a valid Delta E method. Using de1976.", method);
+          delta_e_1976(&color0, &color1)
+        },
+    }
+}
+
 fn main() {
     //Parse command line arguments with clap
     let matches = clap_app!(deltae =>
@@ -73,20 +87,6 @@ fn main() {
     //Select the desired dE method or use de1976 by default
     let arg_method = matches.value_of("METHOD").unwrap_or("de1976");
     eprintln!("Delta E Method: {}", arg_method);
-
-    //Decide which delta e method to use
-    fn de_by_method(color0: &LabValue, color1: &LabValue, method: &str) -> f64 {
-        match method {
-            "de1976" => delta_e_1976(&color0, &color1),
-            //"de2000",
-            //"deCMC1",
-            //"deCMC2",
-            _ => {
-              eprintln!("'{}' is not a valid Delta E method. Using de1976.", method);
-              delta_e_1976(&color0, &color1)
-            },
-        }
-    }
 
     //Parse the arguments into LabValues
     let color0 = string_to_lab( &String::from( matches.value_of("COLOR0").unwrap() ) );
