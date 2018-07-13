@@ -35,6 +35,32 @@ fn delta_e_1976(c1: &LabValue, c2: &LabValue) -> f64 {
     ( (c1.l - c2.l).powi(2) + (c1.a - c2.a).powi(2) + (c1.b - c2.b).powi(2) ).sqrt()
 }
 
+//fn delta_e_2000(c1: &LabValue, c2:&LabValue) -> f64 {
+    //math
+//}
+
+//fn delta_e_CMC1(c1: &LabValue, c2:&LabValue) -> f64 {
+    //math
+//}
+
+//fn delta_e_CMC2(c1: &LabValue, c2:&LabValue) -> f64 {
+    //math
+//}
+
+//Decide which delta e method to use and use it
+fn de_by_method(color0: &LabValue, color1: &LabValue, method: &str) -> f64 {
+    match method {
+        "de1976" => delta_e_1976(&color0, &color1),
+        //"de2000" => delta_e_2000(&color0, &coor1),
+        //"deCMC1" => delta_e_CMC1(&color0, &coor1),
+        //"deCMC2" => delta_e_CMC2(&color0, &coor1),
+        _ => {
+          eprintln!("'{}' is not a valid Delta E method. Using de1976.", method);
+          delta_e_1976(&color0, &color1)
+        },
+    }
+}
+
 //Convert and validate strings to LabValue
 fn string_to_lab(lab_string: &String) -> LabValue {
     //Split string into Vec by comma (,)
@@ -56,20 +82,6 @@ fn string_to_lab(lab_string: &String) -> LabValue {
         l: split[0],
         a: split[1],
         b: split[2],
-    }
-}
-
-//Decide which delta e method to use
-fn de_by_method(color0: &LabValue, color1: &LabValue, method: &str) -> f64 {
-    match method {
-        "de1976" => delta_e_1976(&color0, &color1),
-        //"de2000",
-        //"deCMC1",
-        //"deCMC2",
-        _ => {
-          eprintln!("'{}' is not a valid Delta E method. Using de1976.", method);
-          delta_e_1976(&color0, &color1)
-        },
     }
 }
 
