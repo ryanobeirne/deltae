@@ -15,7 +15,7 @@ cargo build && cargo install
 ```
 
 ## Notes:
-Only calculates de1976 at the moment.
+Only calculates de2000 and de1976 at the moment. The default is de2000.
 
 ### TODO:
-- Add de2000, deCMC1, deCMC2 delta E methods
+- Add de1994, deCMC1, deCMC2 delta E methods
