@@ -29,26 +29,6 @@ fn lab_to_lch(color: &LabValue) -> LchValue {
     }
 }
 
-fn delta_h_calc(h0: &f64, h1: &f64) -> f64 {
-    if h0 - h1 <= 180.0 {
-        h1 - h0
-    } else {
-        if h1 <= h0 {
-            h1 - h0 + 360.0
-        } else {
-            h1 - h0 - 360.0
-        }
-    }
-}
-
-fn avg_h_calc(h0: &f64, h1:&f64) -> f64 {
-    if h0 - h1 > 180.0 {
-        (h0 + h1 + 360.0) / 2.0
-    } else {
-        (h0 + h1) / 2.0
-    }
-}
-
 //This is pretty solid, I think
 fn delta_e_1976(c0: &LabValue, c1: &LabValue) -> f64 {
     ( (c0.l - c1.l).powi(2) + (c0.a - c1.a).powi(2) + (c0.b - c1.b).powi(2) ).sqrt()
