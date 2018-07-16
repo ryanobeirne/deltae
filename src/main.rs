@@ -15,6 +15,7 @@ struct LchValue {
     h: f64,
 }
 
+//Convert Lab to Lch. Not in use now, but may be helpful soon
 fn lab_to_lch(color: &LabValue) -> LchValue {
     let mut h: f64 = color.b.atan2(color.a).to_degrees();
 
@@ -34,6 +35,7 @@ fn delta_e_1976(c0: &LabValue, c1: &LabValue) -> f64 {
     ( (c0.l - c1.l).powi(2) + (c0.a - c1.a).powi(2) + (c0.b - c1.b).powi(2) ).sqrt()
 }
 
+//This is ridiculously complicated
 fn delta_e_2000(c0: &LabValue, c1:&LabValue) -> f64 {
     let l_bar_prime = (c0.l + c1.l)/2.0;
     let c_0 = (c0.a.powi(2) + c0.b.powi(2)).sqrt();
@@ -46,6 +48,7 @@ fn delta_e_2000(c0: &LabValue, c1:&LabValue) -> f64 {
     let c_prime_1 = (a_prime_1.powi(2) + c1.b.powi(2)).sqrt();
     let c_bar_prime = (c_prime_0 + c_prime_1) / 2.0;
     
+    //Hue calculations have to account for degrees: 360 == 0
     let mut h_prime_0 = c0.b.atan2(a_prime_0).to_degrees();
     if h_prime_0 < 0.0 {
         h_prime_0 += 360.0;
@@ -156,13 +159,13 @@ fn main() {
         (version: crate_version!())
         (author: crate_authors!())
         (about: crate_description!())
-        (@arg METHOD: -m --method +takes_value "Sets delta E method (1976, 2000, CMC1, CMC2). Default is dE1976")
+        (@arg METHOD: -m --method +takes_value "Sets delta E method (1976, 2000, CMC1, CMC2). Default is dE2000")
         (@arg COLOR0: +required "Lab values for reference color: (98.08,-0.17,-10.81)")
         (@arg COLOR1: +required "Lab values for comparison color: (89.73,1.88,-6.96)")
     ).get_matches();
 
     //Select the desired dE method or use de1976 by default
-    let arg_method = matches.value_of("METHOD").unwrap_or("de1976");
+    let arg_method = matches.value_of("METHOD").unwrap_or("de2000");
     eprintln!("Delta E Method: {}", arg_method);
 
     //Parse the arguments into LabValues
@@ -170,7 +173,7 @@ fn main() {
     let color1 = string_to_lab( &String::from( matches.value_of("COLOR1").unwrap() ) );
 
     //Calculate and format dE to 2 decimal places
-    let delta_e = format!("{:.*}", 4, de_by_method(&color0, &color1, &arg_method));
+    let delta_e = format!("{:.*}", 2, de_by_method(&color0, &color1, &arg_method));
     println!("{}", delta_e);
 
 }
