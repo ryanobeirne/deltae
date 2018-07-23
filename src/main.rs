@@ -140,8 +140,8 @@ fn de_by_method(c0: &LabValue, c1: &LabValue, method: &str) -> f64 {
         //"deCMC1" => delta_e_CMC1(&color0, &color1),
         //"deCMC2" => delta_e_CMC2(&color0, &color1),
         _ => {
-          eprintln!("'{}' is not a valid Delta E method. Using de1976.", method);
-          delta_e_1976(&c0, &c1)
+          eprintln!("'{}' is not a valid Delta E method. Using de2000.", method);
+          delta_e_2000(&c0, &c1)
         },
     }
 }
@@ -184,7 +184,6 @@ fn main() {
 
     //Select the desired dE method or use de2000 by default
     let arg_method = matches.value_of("METHOD").unwrap_or("de2000");
-    eprintln!("Delta E Method: {}", arg_method);
 
     //Parse the arguments into LabValues
     let color0 = string_to_lab( &String::from( matches.value_of("COLOR0").unwrap() ) );
