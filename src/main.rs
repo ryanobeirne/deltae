@@ -106,6 +106,23 @@ fn delta_e_2000(c0: &LabValue, c1:&LabValue) -> f64 {
     ).sqrt()
 }
 
+fn delta_e_1994(c0: &LabValue, c1: &LabValue) -> f64 {
+    let delta_l = c0.l - c1.l;
+    let chroma_0 = (c0.a.powi(2) + c0.b.powi(2)).sqrt();
+    let chroma_1 = (c1.a.powi(2) + c1.b.powi(2)).sqrt();
+    let delta_chroma = chroma_0 - chroma_1;
+    let delta_a = c0.a - c1.a;
+    let delta_b = c0.b - c1.b;
+    let delta_hue = (delta_a.powi(2) + delta_b.powi(2) - delta_chroma.powi(2)).sqrt();
+    let s_l = 1.0;
+    let s_c = 1.0 + 0.045 * chroma_0;
+    let s_h = 1.0 + 0.015 * chroma_0;
+
+      ( (delta_l / s_l).powi(2)
+      + (delta_chroma / s_c).powi(2)
+      + (delta_hue / s_h).powi(2)
+    ).sqrt()
+}
 //fn delta_e_CMC1(c1: &LabValue, c2:&LabValue) -> f64 {
     //math
 //}
@@ -119,6 +136,7 @@ fn de_by_method(c0: &LabValue, c1: &LabValue, method: &str) -> f64 {
     match method {
         "de1976" | "de76" | "DE1976" | "DE76" | "1976" | "76" => delta_e_1976(&c0, &c1),
         "de2000" | "de00" | "DE2000" | "DE00" | "2000" | "00" => delta_e_2000(&c0, &c1),
+        "de1994" | "de94" | "DE1994" | "DE94" | "1994" | "94" => delta_e_1994(&c0, &c1),
         //"deCMC1" => delta_e_CMC1(&color0, &color1),
         //"deCMC2" => delta_e_CMC2(&color0, &color1),
         _ => {
