@@ -3,7 +3,11 @@ Calculates Delta E between to Lab colors
 
 ## Usage
 ```sh
-deltae 89.73,1.88,-6.96 95.08,-0.17,-10.81
+deltae [--method=<DE Method>] <L,a,b,> <L,a,b>
+```
+#### Example
+```sh
+deltae --method=de1976 89.73,1.88,-6.96 95.08,-0.17,-10.81
 ```
 
 ## Install
@@ -15,7 +19,7 @@ cargo build && cargo install
 ```
 
 ## Notes:
-Only calculates de2000 and de1976 at the moment. The default is de2000.
+Calculates de2000, de1994 (Graphic Arts only), and de1976. The default is de2000.
 
 ### TODO:
 - Add de1994, deCMC1, deCMC2 delta E methods
