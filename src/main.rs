@@ -15,18 +15,20 @@ struct LchValue {
     h: f64,
 }
 
+impl LabValue {
 //Convert Lab to Lch. Not in use now, but may be helpful soon
-fn lab_to_lch(color: &LabValue) -> LchValue {
-    let mut h: f64 = color.b.atan2(color.a).to_degrees();
+    fn lch(&self) -> LchValue {
+        let mut h: f64 = self.b.atan2(self.a).to_degrees();
 
-    if h < 0.0 {
-        h += 360.0;
-    };
+        if h < 0.0 {
+            h += 360.0;
+        };
 
-    LchValue {
-        l: color.l,
-        c: ( color.a.powi(2) + color.b.powi(2) ).sqrt(),
-        h: h % 360.0,
+        LchValue {
+            l: self.l,
+            c: ( self.a.powi(2) + self.b.powi(2) ).sqrt(),
+            h: h % 360.0,
+        }
     }
 }
 
