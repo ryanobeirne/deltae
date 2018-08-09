@@ -69,16 +69,8 @@ fn delta_e_2000(c0: &LabValue, c1:&LabValue) -> f64 {
     let c_bar_prime = (c_prime_0 + c_prime_1) / 2.0;
     
     //Hue calculations have to account for degrees: 360 == 0
-    let mut h_prime_0 = c0.b.atan2(a_prime_0).to_degrees();
-    if h_prime_0 < 0.0 {
-        h_prime_0 += 360.0;
-    };
-
-    let mut h_prime_1 = c1.b.atan2(a_prime_1).to_degrees();
-    if h_prime_1 < 0.0 {
-        h_prime_1 += 360.0;
-    };
-
+    let h_prime_0 = c0.lch().h;
+    let h_prime_1 = c1.lch().h;
     let mut h_bar_prime = h_prime_0 - h_prime_1;
     if h_bar_prime > 180.0 {
         h_bar_prime = (h_prime_0 + h_prime_1 + 360.0) / 2.0;
