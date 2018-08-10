@@ -1,8 +1,8 @@
 [package]
 name = "deltae"
 version = "0.1.0"
-authors = ["Ryan O'Beirne <ryanobeirne@gmail.com>"]
-description = "Calculate Delta E between two colors."
+authors = ["Ryan O'Beirne <robeirne@spoonflower.com>"]
+description = "Calculate Delta E between two colors in CIE Lab space."
 
 [dependencies]
 clap = "2.32.0"

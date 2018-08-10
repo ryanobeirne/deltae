@@ -16,7 +16,7 @@ struct LchValue {
 }
 
 impl LabValue {
-//Convert Lab to Lch. Not in use now, but may be helpful soon
+    //Convert Lab to Lch.
     fn lch(&self) -> LchValue {
         let mut h: f64 = self.b.atan2(self.a).to_degrees();
 
@@ -37,6 +37,8 @@ fn delta_e_1976(c0: &LabValue, c1: &LabValue) -> f64 {
     ( (c0.l - c1.l).powi(2) + (c0.a - c1.a).powi(2) + (c0.b - c1.b).powi(2) ).sqrt()
 }
 
+//Only does Graphic Arts mode at the moment
+//TODO: Add Textiles mode
 fn delta_e_1994(c0: &LabValue, c1: &LabValue) -> f64 {
     let delta_l = c0.l - c1.l;
     let chroma_0 = (c0.a.powi(2) + c0.b.powi(2)).sqrt();
@@ -189,4 +191,3 @@ fn main() {
     println!("{}", delta_e);
 
 }
-
