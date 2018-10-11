@@ -18,6 +18,10 @@ impl LabValue {
         LabValue { l: 0.0, a: 0.0, b: 0.0 }
     }
 
+    pub fn from(s: &str) -> LabValue {
+       string_to_lab(s).unwrap()
+    }
+
     pub fn to_lch(&self) -> LchValue {
         //! Convert Lab to Lch.
         let mut h: f64 = self.b.atan2(self.a).to_degrees();
@@ -34,29 +38,33 @@ impl LabValue {
     }
 }
 
-pub fn string_to_lab(lab_string: &str) -> LabValue {
+use std::fmt::Error;
+pub fn string_to_lab(lab_string: &str) -> Result<LabValue, Error> {
     //! Convert and validate strings to LabValue.
     //! Split string by comma (92.5,33.5,-18.8).
     let split = lab_string.split(",").filter_map(|s| s.parse::<f64>().ok()).collect::<Vec<_>>();
     //Validate that there are only 3 values
     if split.len() != 3 {
         eprintln!("Bad Lab values format: '{}'.\n\tUse 'L,a,b'", lab_string);
-        std::process::exit(1);
+        return Err(Error);
     };
-    //Check that the Lab values are in the proper range or exit
+    //Check that the Lab values are in the proper range or Error
     if  split[0] < 0.0    || split[0] > 100.0 ||
         split[1] < -128.0 || split[1] > 128.0 ||
         split[2] < -128.0 || split[2] > 128.0 {
             eprintln!("Bad Lab values: {}", lab_string);
             eprintln!("\tL: 0..100\n\ta: -128..128\n\tb: -128..128");
-            std::process::exit(1);
-        }
+            return Err(Error);
+    };
+
     //Return the LabValue
-    LabValue {
+    let lab = LabValue {
         l: split[0],
         a: split[1],
         b: split[2],
-    }
+    };
+
+    Ok(lab)
 }
 
 pub fn delta_e_1976(c0: &LabValue, c1: &LabValue) -> f64 {
@@ -112,7 +120,7 @@ pub fn delta_e_2000(c0: &LabValue, c1:&LabValue) -> f64 {
                 + 0.32*(3.0*h_bar_prime +  6.0).to_radians().cos()
                 - 0.20*(4.0*h_bar_prime - 63.0).to_radians().cos();
     
-    let mut delta_h = (h_prime_1 - h_prime_0).abs();
+    let mut delta_h = h_prime_1 - h_prime_0;
     if delta_h > 180.0 && h_prime_1 <= h_prime_0 {
         delta_h += 360.0;
     } else if delta_h > 180.0 {
@@ -154,3 +162,6 @@ pub fn delta_e_2000(c0: &LabValue, c1:&LabValue) -> f64 {
 //fn delta_e_CMC2(c1: &LabValue, c2:&LabValue) -> f64 {
     //math
 //}
+
+#[cfg(test)]
+pub mod tests;

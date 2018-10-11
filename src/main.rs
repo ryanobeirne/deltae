@@ -33,13 +33,15 @@ fn main() {
 
     //Select the desired dE method or use de2000 by default
     let arg_method = matches.value_of("METHOD").unwrap_or("de2000");
+    let arg_color0 = matches.value_of("COLOR0").unwrap();
+    let arg_color1 = matches.value_of("COLOR1").unwrap();
 
     //Parse the arguments into LabValues
-    let color0 = string_to_lab( &String::from( matches.value_of("COLOR0").unwrap() ) );
-    let color1 = string_to_lab( &String::from( matches.value_of("COLOR1").unwrap() ) );
+    let color0 = string_to_lab(arg_color0).unwrap();
+    let color1 = string_to_lab(arg_color1).unwrap();
 
-    //Calculate and format dE to 2 decimal places
-    let delta_e = format!("{:.*}", 2, de_by_method(&color0, &color1, &arg_method));
+    //Calculate and format dE to 4 decimal places
+    let delta_e = format!("{:.*}", 4, de_by_method(&color0, &color1, &arg_method));
     println!("{}", delta_e);
 
 }
