@@ -1,167 +1,71 @@
-#[derive(Debug, PartialEq)]
-pub struct LabValue {
-    pub l: f64,
-    pub a: f64,
-    pub b: f64,
-}
+pub mod color;
+
+#[cfg(test)]
+pub mod tests;
+
+use color::*;
 
 #[derive(Debug, PartialEq)]
-pub struct LchValue {
-    pub l: f64,
-    pub c: f64,
-    pub h: f64,
+pub struct DeltaE {
+    pub method: DEMethod,
+    pub value: f64,
 }
 
-#[derive(Debug)]
-pub enum ValueError {
-    OutOfBounds,
-    BadFormat,
+#[derive(Debug, PartialEq)]
+pub enum DEMethod{
+    DE2000,
+    DE1994,
+    DE1976,
+    // DECMC1,
+    // DECMC2,
 }
 
-pub type ValueResult<T> = Result<T, ValueError>;
-
-impl LabValue {
-    pub fn zero() -> LabValue {
-        //! New LabValue with a value of 0,0,0.
-        LabValue { l: 0.0, a: 0.0, b: 0.0 }
+impl DEMethod {
+    pub fn from(string: &str) -> DEMethod {
+        match string.to_lowercase().as_ref() {
+            "de1976" | "de76" | "1976" | "76" => DEMethod::DE1976,
+            "de2000" | "de00" | "2000" | "00" => DEMethod::DE2000,
+            "de1994" | "de94" | "1994" | "94" => DEMethod::DE1994,
+            // "decmc1" | "cmc1" | "cmc"         => DEMethod::DECMC1,
+            // "decmc2" | "cmc2"                 => DEMethod::DECMC1,
+            _ => {
+                eprintln!("Invalid Method: '{}'. Using DE2000", string);
+                DEMethod::DE2000 
+            }
+        }
     }
+}
 
-    pub fn from(s: &str) -> ValueResult<LabValue> {
-       Ok(string_to_lab(s)?)
-    }
-
-    pub fn to_lch(&self) -> LchValue {
-        //! Convert Lab to Lch.
-        let mut h: f64 = self.b.atan2(self.a).to_degrees();
-
-        if h < 0.0 {
-            h += 360.0;
+impl DeltaE {
+    pub fn new(lab_0: &LabValue, lab_1: &LabValue, method: DEMethod) -> DeltaE {
+        let value = match method {
+            DEMethod::DE1976 => delta_e_1976(lab_0, lab_1),
+            DEMethod::DE1994 => delta_e_1994(lab_0, lab_1),
+            DEMethod::DE2000 => delta_e_2000(lab_0, lab_1),
         };
 
-        LchValue {
-            l: self.l,
-            c: ( self.a.powi(2) + self.b.powi(2) ).sqrt(),
-            h: h % 360.0,
-        }
+        DeltaE { method, value }
     }
 
-    pub fn round_to(&self, places: i32) -> LchValue {
-        LchValue {
-            l: round_to(self.l, places),
-            c: round_to(self.a, places),
-            h: round_to(self.b, places),
-        }       
+    pub fn round_to(self, places: i32) -> DeltaE {
+        DeltaE {
+            method: self.method,
+            value: round_to(self.value, places),
+        }
     }
 }
 
-impl LchValue {
-    pub fn zero() -> LchValue {
-        //! New LchValue with a value of 0,0,0
-        LchValue { l: 0.0, c: 0.0, h: 0.0 }
-    }
-
-    pub fn from(s: &str) -> ValueResult<LchValue> {
-       Ok(string_to_lch(s)?)
-    }
-
-    pub fn to_lab(&self) -> LabValue {
-        LabValue {
-            l: self.l,
-            a: self.c * self.h.to_radians().cos(),
-            b: self.c * self.h.to_radians().sin(),
-        }
-    }
-
-    pub fn round_to(&self, places: i32) -> LchValue {
-        LchValue {
-            l: round_to(self.l, places),
-            c: round_to(self.c, places),
-            h: round_to(self.h, places),
-        }       
-    }
-}
-
-pub fn round_to(val: f64, places: i32) -> f64 {
+fn round_to(val: f64, places: i32) -> f64 {
     let mult = 10_f64.powi(places);
     (val * mult).round() / mult
 }
 
-pub fn string_to_lab(lab_string: &str) -> ValueResult<LabValue> {
-    //! Validate and convert strings to LabValue.
-    //! Split string by comma (92.5,33.5,-18.8).
-    let s = lab_string.split(",");
-    let st: Vec<&str> = s.clone().collect();
-
-    //Validate that there are only 3 values
-    if st.len() != 3 {
-        return Err(ValueError::BadFormat);
-    };
-
-    let split = s.filter_map(|s| s.parse::<f64>().ok()).collect::<Vec<f64>>();
-
-    //Validate that there are only 3 floats
-    if split.len() != 3 {
-        // eprintln!("Bad Lab values format: '{}'\n\tUse 'L,a,b'", lab_string);
-        return Err(ValueError::BadFormat);
-    };
-
-    //Check that the Lab values are in the proper range or Error
-    if  split[0] < 0.0    || split[0] > 100.0 ||
-        split[1] < -128.0 || split[1] > 128.0 ||
-        split[2] < -128.0 || split[2] > 128.0
-    {
-        return Err(ValueError::OutOfBounds);
-    };
-
-    let lab = LabValue {
-        l: split[0],
-        a: split[1],
-        b: split[2],
-    };
-
-    Ok(lab)
-}
-
-pub fn string_to_lch(lch_string: &str) -> ValueResult<LchValue> {
-    //! Validate and convert strings to LchValue.
-    //! Split string by comma (92.5,33.5,240.3).
-    let s = lch_string.split(",");
-    let st: Vec<&str> = s.clone().collect();
-
-    // Validate that there are only 3 values
-    if st.len() != 3 {
-        return Err(ValueError::BadFormat);
-    };
-
-    let split = s.filter_map(|s| s.parse::<f64>().ok()).collect::<Vec<f64>>();
-
-    // Validate that there are only 3 floats
-    if split.len() != 3 {
-        return Err(ValueError::BadFormat);
-    };
-    // Check that the Lab values are in the proper range or Error
-    if  split[0] < 0.0 || split[0] > 100.0 ||
-        split[1] < 0.0 || split[1] > (128_f64.powi(2) + 128_f64.powi(2)).sqrt() ||
-        split[2] < 0.0 || split[2] > 360.0
-    {
-        return Err(ValueError::OutOfBounds);
-    };
-
-    let lch = LchValue {
-        l: split[0],
-        c: split[1],
-        h: split[2],
-    };
-
-    Ok(lch)
-}
-
-pub fn delta_e_1976(c0: &LabValue, c1: &LabValue) -> f64 {
+fn delta_e_1976(c0: &LabValue, c1: &LabValue) -> f64 {
     //! DeltaE 1976. Basic euclidian distance formula.
     ( (c0.l - c1.l).powi(2) + (c0.a - c1.a).powi(2) + (c0.b - c1.b).powi(2) ).sqrt()
 }
 
-pub fn delta_e_1994(c0: &LabValue, c1: &LabValue) -> f64 {
+fn delta_e_1994(c0: &LabValue, c1: &LabValue) -> f64 {
     //! DeltaE 1994. Only does Graphic Arts mode at the moment.
     //! TODO: Add Textiles mode
     let delta_l = c0.l - c1.l;
@@ -181,7 +85,7 @@ pub fn delta_e_1994(c0: &LabValue, c1: &LabValue) -> f64 {
     ).sqrt()
 }
 
-pub fn delta_e_2000(c0: &LabValue, c1:&LabValue) -> f64 {
+fn delta_e_2000(c0: &LabValue, c1:&LabValue) -> f64 {
     //! DeltaE 2000. This is a ridiculously complicated formula.
     let l_bar_prime = (c0.l + c1.l)/2.0;
     let c_0 = (c0.a.powi(2) + c0.b.powi(2)).sqrt();
@@ -251,6 +155,3 @@ pub fn delta_e_2000(c0: &LabValue, c1:&LabValue) -> f64 {
 //fn delta_e_CMC2(c1: &LabValue, c2:&LabValue) -> f64 {
     //math
 //}
-
-#[cfg(test)]
-pub mod tests;

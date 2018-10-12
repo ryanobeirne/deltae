@@ -1,4 +1,5 @@
 use super::*;
+use color::{LabValue, LchValue};
 
 #[test]
 fn round() {
@@ -45,7 +46,7 @@ fn lab_string() {
     ];
 
     for i in good {
-        let b = string_to_lab(i).is_ok();
+        let b = LabValue::from(i).is_ok();
         assert_eq!(b, true);
     }
 
@@ -62,7 +63,7 @@ fn lab_string() {
     ];
 
     for i in bad {
-        let b = string_to_lab(i).is_err();
+        let b = LabValue::from(i).is_err();
         assert_eq!(b, true);
     }
 }
@@ -77,13 +78,14 @@ fn lch_string() {
     ];
 
     for i in good {
-        let b = string_to_lch(i).is_ok();
+        let b = LchValue::from(i).is_ok();
         assert_eq!(b, true);
     }
 
     let bad = &[
         "100,128,-129",
         "100,181.0194,360",
+        "0,-0.01,-0.01",
         "derp",
         "1,2,three,4",
         "",
@@ -94,25 +96,25 @@ fn lch_string() {
     ];
 
     for i in bad {
-        let b = string_to_lch(i).is_err();
+        let b = LchValue::from(i).is_err();
         assert_eq!(b, true);
     }
 }
 
 fn compare_de2000(expected: f64, lab0: &[f64; 3], lab1: &[f64; 3]) {
-let color_0 = LabValue {
-    l: lab0[0],
-    a: lab0[1],
-    b: lab0[2],
-};
+    let color_0 = LabValue {
+        l: lab0[0],
+        a: lab0[1],
+        b: lab0[2],
+    };
 
-let color_1 = LabValue {
+    let color_1 = LabValue {
         l: lab1[0],
         a: lab1[1],
         b: lab1[2],
     };
 
-    let de = round_to(delta_e_2000(&color_0, &color_1), 4);
+    let de = DeltaE::new(&color_0, &color_1, DEMethod::DE2000).round_to(4).value;
 
     assert_eq!(expected, de);
 }
@@ -130,7 +132,7 @@ fn compare_de1976(expected: f64, lab0: &[f64; 3], lab1: &[f64; 3]) {
         b: lab1[2],
     };
 
-    let de = round_to(delta_e_1976(&color_0, &color_1), 4);
+    let de = DeltaE::new(&color_0, &color_1, DEMethod::DE1976).round_to(4).value;
 
     assert_eq!(expected, de);
 }
@@ -141,6 +143,8 @@ fn de1976_test_set() {
     compare_de1976(5.0, &[0.0, 0.0, 0.0] ,&[0.0, 3.0, 4.0]);
     compare_de1976(5.0, &[0.0, 0.0, 0.0] ,&[0.0, -3.0, -4.0]);
     compare_de1976(50.0, &[0.0, 0.0, 0.0] ,&[0.0, -30.0, -40.0]);
+    compare_de1976(181.0193, &[0.0, 0.0, 0.0], &[0.0, 128.0, 128.0]);
+    compare_de1976(362.0387, &[0.0, -128.0, -128.0], &[0.0, 128.0, 128.0]);
 }
 
 // Tests taken from Table 1: "CIEDE2000 total color difference test data" of
