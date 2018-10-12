@@ -1,9 +1,10 @@
 pub mod color;
+use color::*;
 
 #[cfg(test)]
 pub mod tests;
 
-use color::*;
+use std::error::Error;
 
 #[derive(Debug, PartialEq)]
 pub struct DeltaE {
@@ -52,6 +53,16 @@ impl DeltaE {
             method: self.method,
             value: round_to(self.value, places),
         }
+    }
+
+    pub fn parse(color_0: &str, color_1: &str, method: &str) -> Result<DeltaE, Box<Error>> {
+        let lab_0 = LabValue::from(color_0)?;
+        let lab_1 = LabValue::from(color_1)?;
+        let meth = DEMethod::from(method);
+
+        let de = DeltaE::new(&lab_0, &lab_1, meth);
+
+        Ok(de)
     }
 }
 

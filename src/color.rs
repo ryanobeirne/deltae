@@ -1,4 +1,6 @@
 use super::round_to;
+use std::fmt;
+use std::error::Error;
 
 #[derive(Debug, PartialEq)]
 pub struct LabValue {
@@ -22,6 +24,25 @@ pub enum ValueError {
 
 type ValueResult<T> = Result<T, ValueError>;
 
+impl fmt::Display for ValueError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.description())
+    }
+}
+
+impl Error for ValueError {
+    fn description(&self) -> &str {
+        match self {
+            ValueError::OutOfBounds => "Value is out of range!",
+            ValueError::BadFormat   => "Value is malformed!",
+        }
+    }
+
+    fn cause(&self) -> Option<&Error> {
+        Some(self)
+    }
+}
+
 impl LabValue {
     pub fn zero() -> LabValue {
         //! New LabValue with a value of 0,0,0.
@@ -43,7 +64,7 @@ impl LabValue {
         LchValue {
             l: self.l,
             c: ( self.a.powi(2) + self.b.powi(2) ).sqrt(),
-            h: h % 360.0
+            h: h
         }
     }
 

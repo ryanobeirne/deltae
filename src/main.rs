@@ -3,7 +3,6 @@ extern crate clap;
 extern crate deltae;
 
 use deltae::*;
-use deltae::color::LabValue;
 
 fn main() {
     //Parse command line arguments with clap
@@ -16,19 +15,17 @@ fn main() {
         (@arg COLOR1: +required "Lab values for comparison color: (89.73,1.88,-6.96)")
     ).get_matches();
 
-    // Select the desired dE method or use de2000 by default
-    let arg_method = matches.value_of("METHOD").unwrap_or("de2000");
-    let arg_color0 = matches.value_of("COLOR0").unwrap();
-    let arg_color1 = matches.value_of("COLOR1").unwrap();
+    let method = matches.value_of("METHOD").unwrap_or("de2000");
+    let color0 = matches.value_of("COLOR0").unwrap();
+    let color1 = matches.value_of("COLOR1").unwrap();
 
-    //Parse the arguments into LabValues
-    let lab_0 = LabValue::from(arg_color0).unwrap();
-    let lab_1 = LabValue::from(arg_color1).unwrap();
+    let delta_e = DeltaE::parse(color0, color1, method);
 
-    // Calculate and format dE to 4 decimal places
-    let de_method = DEMethod::from(&arg_method);
-    let delta_e = DeltaE::new(&lab_0, &lab_1, de_method);
-
-    // Round to 4 places and print
-    println!("{}", delta_e.round_to(4).value);
+    match delta_e {
+        Ok(de) => println!("{}", de.round_to(4).value),
+        Err(e) => {
+            eprintln!("ERROR: {}", e);
+            std::process::exit(1);
+        }
+    };
 }
