@@ -6,13 +6,13 @@ pub mod tests;
 
 use std::error::Error;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct DeltaE {
     pub method: DEMethod,
     pub value: f64,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum DEMethod{
     DE2000,
     DE1994,
@@ -23,6 +23,7 @@ pub enum DEMethod{
 
 impl DEMethod {
     pub fn from(string: &str) -> DEMethod {
+        //! Parse `DEMethod` from `&str`.
         match string.to_lowercase().as_ref() {
             "de1976" | "de76" | "1976" | "76" => DEMethod::DE1976,
             "de2000" | "de00" | "2000" | "00" => DEMethod::DE2000,
@@ -39,6 +40,7 @@ impl DEMethod {
 
 impl DeltaE {
     pub fn new(lab_0: &LabValue, lab_1: &LabValue, method: DEMethod) -> DeltaE {
+    //! New DeltaE from `LabValues` and `DEMethod`.
         let value = match method {
             DEMethod::DE1976 => delta_e_1976(lab_0, lab_1),
             DEMethod::DE1994 => delta_e_1994(lab_0, lab_1),
@@ -48,14 +50,16 @@ impl DeltaE {
         DeltaE { method, value }
     }
 
-    pub fn round_to(self, places: i32) -> DeltaE {
+    pub fn round_to(&self, places: i32) -> DeltaE {
+        //! Round DeltaE value to nearest decimal places
         DeltaE {
-            method: self.method,
+            method: self.method.clone(),
             value: round_to(self.value, places),
         }
     }
 
     pub fn parse(color_0: &str, color_1: &str, method: &str) -> Result<DeltaE, Box<Error>> {
+        //! Parse DeltaE from `&str`'s
         let lab_0 = LabValue::from(color_0)?;
         let lab_1 = LabValue::from(color_1)?;
         let meth = DEMethod::from(method);

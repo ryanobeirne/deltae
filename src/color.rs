@@ -50,7 +50,8 @@ impl LabValue {
     }
 
     pub fn from(s: &str) -> ValueResult<LabValue> {
-       Ok(string_to_lab(s)?)
+        //! Parse LabValue from &str
+        Ok(string_to_lab(s)?)
     }
 
     pub fn to_lch(&self) -> LchValue {
@@ -69,6 +70,7 @@ impl LabValue {
     }
 
     pub fn round_to(&self, places: i32) -> LchValue {
+        //! Round LchValue to nearest decimal places.
         LchValue {
             l: round_to(self.l, places),
             c: round_to(self.a, places),
@@ -84,10 +86,12 @@ impl LchValue {
     }
 
     pub fn from(s: &str) -> ValueResult<LchValue> {
-       Ok(string_to_lch(s)?)
+        //! Parse LchValue from &str
+        Ok(string_to_lch(s)?)
     }
 
     pub fn to_lab(&self) -> LabValue {
+        //! Convert LchValue to LabValue
         LabValue {
             l: self.l,
             a: self.c * self.h.to_radians().cos(),
@@ -96,6 +100,7 @@ impl LchValue {
     }
 
     pub fn round_to(&self, places: i32) -> LchValue {
+        //! Round LchValue to nearest decimal places.
         LchValue {
             l: round_to(self.l, places),
             c: round_to(self.c, places),
