@@ -69,12 +69,12 @@ impl LabValue {
         }
     }
 
-    pub fn round_to(&self, places: i32) -> LchValue {
+    pub fn round_to(&self, places: i32) -> LabValue {
         //! Round LchValue to nearest decimal places.
-        LchValue {
+        LabValue {
             l: round_to(self.l, places),
-            c: round_to(self.a, places),
-            h: round_to(self.b, places),
+            a: round_to(self.a, places),
+            b: round_to(self.b, places),
         }       
     }
 }

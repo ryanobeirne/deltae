@@ -64,12 +64,12 @@ impl DeltaE {
     }
 
     pub fn round_to(self, places: i32) -> Self {
-        //! Round DeltaE value to nearest decimal places
+        //! Round DeltaE value and its components to nearest decimal places
         DeltaE {
             method: self.method,
             value: round_to(self.value, places),
-            color0: self.color0,
-            color1: self.color1,
+            color0: self.color0.round_to(places),
+            color1: self.color1.round_to(places),
         }
     }
 
