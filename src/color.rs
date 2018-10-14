@@ -2,14 +2,14 @@ use super::round_to;
 use std::fmt;
 use std::error::Error;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct LabValue {
     pub l: f64,
     pub a: f64,
     pub b: f64,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct LchValue {
     pub l: f64,
     pub c: f64,

@@ -10,6 +10,8 @@ use std::error::Error;
 pub struct DeltaE {
     pub method: DEMethod,
     pub value: f64,
+    pub color0: LabValue,
+    pub color1: LabValue,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -47,14 +49,19 @@ impl DeltaE {
             DEMethod::DE2000 => delta_e_2000(lab_0, lab_1),
         };
 
-        DeltaE { method, value }
+        let color0 = lab_0.to_owned();
+        let color1 = lab_0.to_owned();
+
+        DeltaE { method, value, color0, color1 }
     }
 
-    pub fn round_to(&self, places: i32) -> DeltaE {
+    pub fn round_to(self, places: i32) -> Self {
         //! Round DeltaE value to nearest decimal places
         DeltaE {
-            method: self.method.clone(),
+            method: self.method,
             value: round_to(self.value, places),
+            color0: self.color0,
+            color1: self.color1,
         }
     }
 
