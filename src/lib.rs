@@ -1,3 +1,5 @@
+use std::fmt;
+
 pub mod color;
 use color::*;
 
@@ -24,7 +26,7 @@ pub enum DEMethod{
 }
 
 impl DEMethod {
-    pub fn from(string: &str) -> DEMethod {
+    pub fn from(string: &str) -> Self {
         //! Parse `DEMethod` from `&str`.
         match string.to_lowercase().as_ref() {
             "de1976" | "de76" | "1976" | "76" => DEMethod::DE1976,
@@ -37,6 +39,12 @@ impl DEMethod {
                 DEMethod::DE2000 
             }
         }
+    }
+}
+
+impl fmt::Display for DEMethod {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
     }
 }
 
