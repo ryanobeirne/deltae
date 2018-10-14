@@ -79,6 +79,12 @@ impl LabValue {
     }
 }
 
+impl fmt::Display for LabValue {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "[L:{}, a:{}, b:{}]", self.l, self.a, self.b)
+    }
+}
+
 impl LchValue {
     pub fn zero() -> LchValue {
         //! New LchValue with a value of 0,0,0
@@ -136,6 +142,12 @@ fn string_to_lab(lab_string: &str) -> ValueResult<LabValue> {
     };
 
     Ok(lab)
+}
+
+impl fmt::Display for LchValue {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "[L:{}, c:{}, h:{}]", self.l, self.c, self.h)
+    }
 }
 
 fn string_to_lch(lch_string: &str) -> ValueResult<LchValue> {

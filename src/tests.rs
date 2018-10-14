@@ -116,8 +116,8 @@ fn compare_de2000(expected: f64, lab0: &[f64; 3], lab1: &[f64; 3]) {
 
     let de = DeltaE::new(&color_0, &color_1, DEMethod::DE2000).round_to(4).value;
 
-    println!("{}\t{}\t{}\t{}%", expected, de, round_to(de - expected, 4), round_to((( de - expected) / expected) * 100.0, 4) );
-    // assert_eq!(expected, de);
+    // println!("{}\t{}\t{}\t{}%", expected, de, round_to(de - expected, 4), round_to((( de - expected) / expected) * 100.0, 4) );
+    assert_eq!(expected, de);
 }
 
 fn compare_de1976(expected: f64, lab0: &[f64; 3], lab1: &[f64; 3]) {

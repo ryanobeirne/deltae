@@ -58,7 +58,7 @@ impl DeltaE {
         };
 
         let color0 = lab_0.to_owned();
-        let color1 = lab_0.to_owned();
+        let color1 = lab_1.to_owned();
 
         DeltaE { method, value, color0, color1 }
     }
