@@ -16,6 +16,48 @@ pub struct DeltaE {
     pub color1: LabValue,
 }
 
+impl DeltaE {
+    pub fn new(lab_0: &LabValue, lab_1: &LabValue, method: DEMethod) -> DeltaE {
+    //! New `DeltaE` from `LabValues` and `DEMethod`.
+        let value = match method {
+            DEMethod::DE1976 => delta_e_1976(lab_0, lab_1),
+            DEMethod::DE1994 => delta_e_1994(lab_0, lab_1),
+            DEMethod::DE2000 => delta_e_2000(lab_0, lab_1),
+        };
+
+        let color0 = lab_0.to_owned();
+        let color1 = lab_1.to_owned();
+
+        DeltaE { method, value, color0, color1 }
+    }
+
+    pub fn round_to(self, places: i32) -> Self {
+        //! Round `DeltaE` value and its components to nearest decimal places
+        DeltaE {
+            method: self.method,
+            value: round_to(self.value, places),
+            color0: self.color0.round_to(places),
+            color1: self.color1.round_to(places),
+        }
+    }
+
+    pub fn parse(color_0: &str, color_1: &str, method: &str) -> Result<DeltaE, Box<Error>> {
+        //! Parse `DeltaE` from `&str`'s
+        let lab_0 = LabValue::from(color_0)?;
+        let lab_1 = LabValue::from(color_1)?;
+        let meth = DEMethod::from(method);
+
+        let de = DeltaE::new(&lab_0, &lab_1, meth);
+
+        Ok(de)
+    }
+}
+
+fn round_to(val: f64, places: i32) -> f64 {
+    let mult = 10_f64.powi(places);
+    (val * mult).round() / mult
+}
+
 #[derive(Debug, PartialEq, Clone)]
 pub enum DEMethod{
     DE2000,
@@ -46,48 +88,6 @@ impl fmt::Display for DEMethod {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{:?}", self)
     }
-}
-
-impl DeltaE {
-    pub fn new(lab_0: &LabValue, lab_1: &LabValue, method: DEMethod) -> DeltaE {
-    //! New DeltaE from `LabValues` and `DEMethod`.
-        let value = match method {
-            DEMethod::DE1976 => delta_e_1976(lab_0, lab_1),
-            DEMethod::DE1994 => delta_e_1994(lab_0, lab_1),
-            DEMethod::DE2000 => delta_e_2000(lab_0, lab_1),
-        };
-
-        let color0 = lab_0.to_owned();
-        let color1 = lab_1.to_owned();
-
-        DeltaE { method, value, color0, color1 }
-    }
-
-    pub fn round_to(self, places: i32) -> Self {
-        //! Round DeltaE value and its components to nearest decimal places
-        DeltaE {
-            method: self.method,
-            value: round_to(self.value, places),
-            color0: self.color0.round_to(places),
-            color1: self.color1.round_to(places),
-        }
-    }
-
-    pub fn parse(color_0: &str, color_1: &str, method: &str) -> Result<DeltaE, Box<Error>> {
-        //! Parse DeltaE from `&str`'s
-        let lab_0 = LabValue::from(color_0)?;
-        let lab_1 = LabValue::from(color_1)?;
-        let meth = DEMethod::from(method);
-
-        let de = DeltaE::new(&lab_0, &lab_1, meth);
-
-        Ok(de)
-    }
-}
-
-fn round_to(val: f64, places: i32) -> f64 {
-    let mult = 10_f64.powi(places);
-    (val * mult).round() / mult
 }
 
 fn delta_e_1976(c0: &LabValue, c1: &LabValue) -> f64 {

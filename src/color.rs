@@ -9,40 +9,6 @@ pub struct LabValue {
     pub b: f64,
 }
 
-#[derive(Debug, PartialEq, Clone)]
-pub struct LchValue {
-    pub l: f64,
-    pub c: f64,
-    pub h: f64,
-}
-
-#[derive(Debug)]
-pub enum ValueError {
-    OutOfBounds,
-    BadFormat,
-}
-
-type ValueResult<T> = Result<T, ValueError>;
-
-impl fmt::Display for ValueError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.description())
-    }
-}
-
-impl Error for ValueError {
-    fn description(&self) -> &str {
-        match self {
-            ValueError::OutOfBounds => "Value is out of range!",
-            ValueError::BadFormat   => "Value is malformed!",
-        }
-    }
-
-    fn cause(&self) -> Option<&Error> {
-        Some(self)
-    }
-}
-
 impl LabValue {
     pub fn new(l: f64, a: f64, b: f64) -> Self {
         //! New `LabValue` from 3 `f64`s
@@ -90,6 +56,13 @@ impl fmt::Display for LabValue {
     }
 }
 
+#[derive(Debug, PartialEq, Clone)]
+pub struct LchValue {
+    pub l: f64,
+    pub c: f64,
+    pub h: f64,
+}
+
 impl LchValue {
     pub fn new(l: f64, c: f64, h: f64) -> Self {
         //! New `LchValue` from 3 `f64`s
@@ -122,6 +95,39 @@ impl LchValue {
             c: round_to(self.c, places),
             h: round_to(self.h, places),
         }       
+    }
+}
+
+impl fmt::Display for LchValue {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "[L:{}, c:{}, h:{}]", self.l, self.c, self.h)
+    }
+}
+
+#[derive(Debug)]
+pub enum ValueError {
+    OutOfBounds,
+    BadFormat,
+}
+
+type ValueResult<T> = Result<T, ValueError>;
+
+impl fmt::Display for ValueError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.description())
+    }
+}
+
+impl Error for ValueError {
+    fn description(&self) -> &str {
+        match self {
+            ValueError::OutOfBounds => "Value is out of range!",
+            ValueError::BadFormat   => "Value is malformed!",
+        }
+    }
+
+    fn cause(&self) -> Option<&Error> {
+        Some(self)
     }
 }
 
