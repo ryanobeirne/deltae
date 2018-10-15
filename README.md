@@ -6,7 +6,7 @@ A rust library for interacting with and manipulating Lab and Lch colors and calc
 
 ---
 
-<!-- [Rust API Documentation](https://ryanobeirne.com/deltae/index.html) -->
+[Rust API Documentation](https://robeirne.github.io/deltae)
 
 ### Examples
 
