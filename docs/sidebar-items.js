@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["DEMethod",""]],"mod":[["color",""]],"struct":[["DeltaE",""]]});
