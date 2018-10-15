@@ -125,17 +125,31 @@ impl LchValue {
     }
 }
 
-fn string_to_lab(lab_string: &str) -> ValueResult<LabValue> {
-    //! Validate and convert strings to `LabValue`.
-    //! Split string by comma (92.5,33.5,-18.8).
-    let s = lab_string.split(",");
-    let st: Vec<&str> = s.clone().collect();
-    let split: Vec<f64> = s.filter_map(|s| s.parse().ok()).collect();
+fn parse_str_to_vecf64(s: &str, length: usize) -> Result<Vec<f64>, ValueError> {
+    // Validate and convert strings to `LabValue`.
+    // Split string by comma (92.5,33.5,-18.8).
+    let collection: Vec<&str> = s.split(",").collect();
+    
+    // Allow extraneous whitespace ("92.5, 33.5, -18.8")
+    let mut v: Vec<&str> = Vec::new();
+    for item in collection.iter() {
+        if !item.is_empty() {
+            v.push(item.trim());
+        }
+    }
+    // Parse the f64's into a Vec
+    let split: Vec<f64> = v.iter().filter_map(|s| s.parse().ok()).collect();
 
-    // Validate that there are only 3 values
-    if st.len() != 3 || split.len() != 3 {
+    // Check if it's the right number of items
+    if v.len() != length || split.len() != length {
         return Err(ValueError::BadFormat);
-    };
+    }
+
+    Ok(split)
+}
+
+fn string_to_lab(lab_string: &str) -> ValueResult<LabValue> {
+    let split = parse_str_to_vecf64(lab_string, 3)?;
 
     // Check that the Lab values are in the proper range or Error
     if  split[0] < 0.0    || split[0] > 100.0 ||
@@ -154,23 +168,8 @@ fn string_to_lab(lab_string: &str) -> ValueResult<LabValue> {
     Ok(lab)
 }
 
-impl fmt::Display for LchValue {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "[L:{}, c:{}, h:{}]", self.l, self.c, self.h)
-    }
-}
-
 fn string_to_lch(lch_string: &str) -> ValueResult<LchValue> {
-    //! Validate and convert strings to `LchValue`.
-    //! Split string by comma (92.5,153.2,240.3).
-    let s = lch_string.split(",");
-    let st: Vec<&str> = s.clone().collect();
-    let split: Vec<f64> = s.filter_map(|s| s.parse().ok()).collect();
-
-    // Validate that there are only 3 values
-    if st.len() != 3 || split.len() != 3 {
-        return Err(ValueError::BadFormat);
-    };
+    let split = parse_str_to_vecf64(lch_string, 3)?;
 
     // Check that the Lab values are in the proper range or Error
     if  split[0] < 0.0 || split[0] > 100.0 ||
