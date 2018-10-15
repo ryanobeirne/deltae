@@ -44,19 +44,24 @@ impl Error for ValueError {
 }
 
 impl LabValue {
-    pub fn zero() -> LabValue {
-        //! New LabValue with a value of 0,0,0.
-        LabValue { l: 0.0, a: 0.0, b: 0.0 }
+    pub fn new(l: f64, a: f64, b: f64) -> Self {
+        //! New `LabValue` from 3 `f64`s
+        Self{l, a, b}
     }
 
-    pub fn from(s: &str) -> ValueResult<LabValue> {
-        //! Parse LabValue from &str
+    pub fn zero() -> Self {
+        //! New `LabValue` with a value of 0,0,0.
+        Self { l: 0.0, a: 0.0, b: 0.0 }
+    }
+
+    pub fn from(s: &str) -> ValueResult<Self> {
+        //! Parse `LabValue` from `&str`
         Ok(string_to_lab(s)?)
     }
 
     pub fn to_lch(&self) -> LchValue {
-        //! Convert Lab to Lch.
-        let mut h: f64 = self.b.atan2(self.a).to_degrees();
+        //! Convert Lab to Lch
+        let mut h: f64 = (self.b.atan2(self.a)).to_degrees();
 
         if h < 0.0 {
             h += 360.0;
@@ -71,7 +76,7 @@ impl LabValue {
 
     pub fn round_to(&self, places: i32) -> LabValue {
         //! Round LchValue to nearest decimal places.
-        LabValue {
+        Self {
             l: round_to(self.l, places),
             a: round_to(self.a, places),
             b: round_to(self.b, places),
@@ -86,18 +91,23 @@ impl fmt::Display for LabValue {
 }
 
 impl LchValue {
-    pub fn zero() -> LchValue {
-        //! New LchValue with a value of 0,0,0
-        LchValue { l: 0.0, c: 0.0, h: 0.0 }
+    pub fn new(l: f64, c: f64, h: f64) -> Self {
+        //! New `LchValue` from 3 `f64`s
+        Self {l, c, h}
     }
 
-    pub fn from(s: &str) -> ValueResult<LchValue> {
-        //! Parse LchValue from &str
+    pub fn zero() -> Self {
+        //! New LchValue with a value of 0,0,0
+        Self { l: 0.0, c: 0.0, h: 0.0 }
+    }
+
+    pub fn from(s: &str) -> ValueResult<Self> {
+        //! Parse `LchValue` from `&str`
         Ok(string_to_lch(s)?)
     }
 
     pub fn to_lab(&self) -> LabValue {
-        //! Convert LchValue to LabValue
+        //! Convert `LchValue` to `LabValue`
         LabValue {
             l: self.l,
             a: self.c * self.h.to_radians().cos(),
@@ -105,9 +115,9 @@ impl LchValue {
         }
     }
 
-    pub fn round_to(&self, places: i32) -> LchValue {
-        //! Round LchValue to nearest decimal places.
-        LchValue {
+    pub fn round_to(&self, places: i32) -> Self {
+        //! Round `LchValue` to nearest decimal places.
+        Self {
             l: round_to(self.l, places),
             c: round_to(self.c, places),
             h: round_to(self.h, places),
@@ -116,7 +126,7 @@ impl LchValue {
 }
 
 fn string_to_lab(lab_string: &str) -> ValueResult<LabValue> {
-    //! Validate and convert strings to LabValue.
+    //! Validate and convert strings to `LabValue`.
     //! Split string by comma (92.5,33.5,-18.8).
     let s = lab_string.split(",");
     let st: Vec<&str> = s.clone().collect();
@@ -151,7 +161,7 @@ impl fmt::Display for LchValue {
 }
 
 fn string_to_lch(lch_string: &str) -> ValueResult<LchValue> {
-    //! Validate and convert strings to LchValue.
+    //! Validate and convert strings to `LchValue`.
     //! Split string by comma (92.5,153.2,240.3).
     let s = lch_string.split(",");
     let st: Vec<&str> = s.clone().collect();

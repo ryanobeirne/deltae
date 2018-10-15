@@ -115,6 +115,12 @@ fn delta_e_1994(c0: &LabValue, c1: &LabValue) -> f64 {
     ).sqrt()
 }
 
+#[test]
+fn hprime() {
+    let lab = LabValue::new(0.0, 50.0, 23.0);
+    println!("{}", lab.to_lch().h);
+}
+
 fn delta_e_2000(c0: &LabValue, c1:&LabValue) -> f64 {
     //! DeltaE 2000. This is a ridiculously complicated formula.
     let l_bar_prime = (c0.l + c1.l)/2.0;
@@ -127,8 +133,6 @@ fn delta_e_2000(c0: &LabValue, c1:&LabValue) -> f64 {
     let c_prime_0 = (a_prime_0.powi(2) + c0.b.powi(2)).sqrt();
     let c_prime_1 = (a_prime_1.powi(2) + c1.b.powi(2)).sqrt();
     let c_bar_prime = (c_prime_0 + c_prime_1) / 2.0;
-    
-    //Hue calculations have to account for degrees: 360 == 0
     let h_prime_0 = c0.to_lch().h;
     let h_prime_1 = c1.to_lch().h;
     let mut h_bar_prime = h_prime_0 - h_prime_1;
@@ -138,10 +142,10 @@ fn delta_e_2000(c0: &LabValue, c1:&LabValue) -> f64 {
         h_bar_prime = (h_prime_0 + h_prime_1) / 2.0;
     };
 
-    let t = 1.0 - 0.17*(    h_bar_prime - 30.0).to_radians().cos()
-                + 0.24*(2.0*h_bar_prime       ).to_radians().cos()
-                + 0.32*(3.0*h_bar_prime +  6.0).to_radians().cos()
-                - 0.20*(4.0*h_bar_prime - 63.0).to_radians().cos();
+    let t = 1.0 - 0.17 * ((      h_bar_prime - 30.0).to_radians()).cos()
+                + 0.24 * ((2.0 * h_bar_prime       ).to_radians()).cos()
+                + 0.32 * ((3.0 * h_bar_prime +  6.0).to_radians()).cos()
+                - 0.20 * ((4.0 * h_bar_prime - 63.0).to_radians()).cos();
     
     let mut delta_h = h_prime_1 - h_prime_0;
     if delta_h > 180.0 && h_prime_1 <= h_prime_0 {
