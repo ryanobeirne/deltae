@@ -41,7 +41,7 @@ impl DeltaE {
         }
     }
 
-    pub fn parse(color_0: &str, color_1: &str, method: &str) -> Result<DeltaE, Box<Error>> {
+    pub fn from(color_0: &str, color_1: &str, method: &str) -> Result<DeltaE, Box<Error>> {
         //! Parse `DeltaE` from `&str`'s
         let lab_0 = LabValue::from(color_0)?;
         let lab_1 = LabValue::from(color_1)?;
@@ -50,6 +50,12 @@ impl DeltaE {
         let de = DeltaE::new(&lab_0, &lab_1, meth);
 
         Ok(de)
+    }
+}
+
+impl fmt::Display for DeltaE {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", &self.value)
     }
 }
 

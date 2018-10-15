@@ -19,7 +19,7 @@ fn main() {
     let color0 = matches.value_of("COLOR0").unwrap();
     let color1 = matches.value_of("COLOR1").unwrap();
 
-    let delta_e = DeltaE::parse(color0, color1, method);
+    let delta_e = DeltaE::from(color0, color1, method);
 
     match delta_e {
         Ok(de) => println!("{}", de.round_to(4).value),
