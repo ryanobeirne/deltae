@@ -188,6 +188,11 @@
 <span id="188">188</span>
 <span id="189">189</span>
 <span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">round_to</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
@@ -198,40 +203,6 @@
     <span class="kw">pub</span> <span class="ident">l</span>: <span class="ident">f64</span>,
     <span class="kw">pub</span> <span class="ident">a</span>: <span class="ident">f64</span>,
     <span class="kw">pub</span> <span class="ident">b</span>: <span class="ident">f64</span>,
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LchValue</span> {
-    <span class="kw">pub</span> <span class="ident">l</span>: <span class="ident">f64</span>,
-    <span class="kw">pub</span> <span class="ident">c</span>: <span class="ident">f64</span>,
-    <span class="kw">pub</span> <span class="ident">h</span>: <span class="ident">f64</span>,
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ValueError</span> {
-    <span class="ident">OutOfBounds</span>,
-    <span class="ident">BadFormat</span>,
-}
-
-<span class="kw">type</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">ValueError</span><span class="op">&gt;</span>;
-
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ValueError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">description</span>())
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">ValueError</span> {
-    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ValueError</span>::<span class="ident">OutOfBounds</span> <span class="op">=&gt;</span> <span class="string">&quot;Value is out of range!&quot;</span>,
-            <span class="ident">ValueError</span>::<span class="ident">BadFormat</span>   <span class="op">=&gt;</span> <span class="string">&quot;Value is malformed!&quot;</span>,
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">cause</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>)
-    }
 }
 
 <span class="kw">impl</span> <span class="ident">LabValue</span> {
@@ -281,6 +252,13 @@
     }
 }
 
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LchValue</span> {
+    <span class="kw">pub</span> <span class="ident">l</span>: <span class="ident">f64</span>,
+    <span class="kw">pub</span> <span class="ident">c</span>: <span class="ident">f64</span>,
+    <span class="kw">pub</span> <span class="ident">h</span>: <span class="ident">f64</span>,
+}
+
 <span class="kw">impl</span> <span class="ident">LchValue</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">l</span>: <span class="ident">f64</span>, <span class="ident">c</span>: <span class="ident">f64</span>, <span class="ident">h</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="doccomment">//! New `LchValue` from 3 `f64`s</span>
@@ -316,17 +294,64 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">string_to_lab</span>(<span class="ident">lab_string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">LabValue</span><span class="op">&gt;</span> {
-    <span class="doccomment">//! Validate and convert strings to `LabValue`.</span>
-    <span class="doccomment">//! Split string by comma (92.5,33.5,-18.8).</span>
-    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">lab_string</span>.<span class="ident">split</span>(<span class="string">&quot;,&quot;</span>);
-    <span class="kw">let</span> <span class="ident">st</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">clone</span>().<span class="ident">collect</span>();
-    <span class="kw">let</span> <span class="ident">split</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()).<span class="ident">collect</span>();
+<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">LchValue</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;[L:{}, c:{}, h:{}]&quot;</span>, <span class="self">self</span>.<span class="ident">l</span>, <span class="self">self</span>.<span class="ident">c</span>, <span class="self">self</span>.<span class="ident">h</span>)
+    }
+}
 
-    <span class="comment">// Validate that there are only 3 values</span>
-    <span class="kw">if</span> <span class="ident">st</span>.<span class="ident">len</span>() <span class="op">!=</span> <span class="number">3</span> <span class="op">||</span> <span class="ident">split</span>.<span class="ident">len</span>() <span class="op">!=</span> <span class="number">3</span> {
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ValueError</span> {
+    <span class="ident">OutOfBounds</span>,
+    <span class="ident">BadFormat</span>,
+}
+
+<span class="kw">type</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">ValueError</span><span class="op">&gt;</span>;
+
+<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ValueError</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">description</span>())
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">ValueError</span> {
+    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">ValueError</span>::<span class="ident">OutOfBounds</span> <span class="op">=&gt;</span> <span class="string">&quot;Value is out of range!&quot;</span>,
+            <span class="ident">ValueError</span>::<span class="ident">BadFormat</span>   <span class="op">=&gt;</span> <span class="string">&quot;Value is malformed!&quot;</span>,
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">cause</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>)
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">parse_str_to_vecf64</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">length</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">ValueError</span><span class="op">&gt;</span> {
+    <span class="comment">// Validate and convert strings to `LabValue`.</span>
+    <span class="comment">// Split string by comma (92.5,33.5,-18.8).</span>
+    <span class="kw">let</span> <span class="ident">collection</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&quot;,&quot;</span>).<span class="ident">collect</span>();
+    
+    <span class="comment">// Allow extraneous whitespace (&quot;92.5, 33.5, -18.8&quot;)</span>
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+    <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">collection</span>.<span class="ident">iter</span>() {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">item</span>.<span class="ident">is_empty</span>() {
+            <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">item</span>.<span class="ident">trim</span>());
+        }
+    }
+    <span class="comment">// Parse the f64&#39;s into a Vec</span>
+    <span class="kw">let</span> <span class="ident">split</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()).<span class="ident">collect</span>();
+
+    <span class="comment">// Check if it&#39;s the right number of items</span>
+    <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">len</span>() <span class="op">!=</span> <span class="ident">length</span> <span class="op">||</span> <span class="ident">split</span>.<span class="ident">len</span>() <span class="op">!=</span> <span class="ident">length</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ValueError</span>::<span class="ident">BadFormat</span>);
-    };
+    }
+
+    <span class="prelude-val">Ok</span>(<span class="ident">split</span>)
+}
+
+<span class="kw">fn</span> <span class="ident">string_to_lab</span>(<span class="ident">lab_string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">LabValue</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">split</span> <span class="op">=</span> <span class="ident">parse_str_to_vecf64</span>(<span class="ident">lab_string</span>, <span class="number">3</span>)<span class="question-mark">?</span>;
 
     <span class="comment">// Check that the Lab values are in the proper range or Error</span>
     <span class="kw">if</span>  <span class="ident">split</span>[<span class="number">0</span>] <span class="op">&lt;</span> <span class="number">0.0</span>    <span class="op">||</span> <span class="ident">split</span>[<span class="number">0</span>] <span class="op">&gt;</span> <span class="number">100.0</span> <span class="op">||</span>
@@ -345,23 +370,8 @@
     <span class="prelude-val">Ok</span>(<span class="ident">lab</span>)
 }
 
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">LchValue</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;[L:{}, c:{}, h:{}]&quot;</span>, <span class="self">self</span>.<span class="ident">l</span>, <span class="self">self</span>.<span class="ident">c</span>, <span class="self">self</span>.<span class="ident">h</span>)
-    }
-}
-
 <span class="kw">fn</span> <span class="ident">string_to_lch</span>(<span class="ident">lch_string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">LchValue</span><span class="op">&gt;</span> {
-    <span class="doccomment">//! Validate and convert strings to `LchValue`.</span>
-    <span class="doccomment">//! Split string by comma (92.5,153.2,240.3).</span>
-    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">lch_string</span>.<span class="ident">split</span>(<span class="string">&quot;,&quot;</span>);
-    <span class="kw">let</span> <span class="ident">st</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">clone</span>().<span class="ident">collect</span>();
-    <span class="kw">let</span> <span class="ident">split</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()).<span class="ident">collect</span>();
-
-    <span class="comment">// Validate that there are only 3 values</span>
-    <span class="kw">if</span> <span class="ident">st</span>.<span class="ident">len</span>() <span class="op">!=</span> <span class="number">3</span> <span class="op">||</span> <span class="ident">split</span>.<span class="ident">len</span>() <span class="op">!=</span> <span class="number">3</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ValueError</span>::<span class="ident">BadFormat</span>);
-    };
+    <span class="kw">let</span> <span class="ident">split</span> <span class="op">=</span> <span class="ident">parse_str_to_vecf64</span>(<span class="ident">lch_string</span>, <span class="number">3</span>)<span class="question-mark">?</span>;
 
     <span class="comment">// Check that the Lab values are in the proper range or Error</span>
     <span class="kw">if</span>  <span class="ident">split</span>[<span class="number">0</span>] <span class="op">&lt;</span> <span class="number">0.0</span> <span class="op">||</span> <span class="ident">split</span>[<span class="number">0</span>] <span class="op">&gt;</span> <span class="number">100.0</span> <span class="op">||</span>
