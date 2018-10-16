@@ -154,12 +154,6 @@ fn delta_e_1994(c0: &LabValue, c1: &LabValue) -> f64 {
     ).sqrt()
 }
 
-#[test]
-fn hprime() {
-    let lab = LabValue::new(0.0, 50.0, 23.0);
-    println!("{}", lab.to_lch().h);
-}
-
 fn delta_e_2000(c0: &LabValue, c1:&LabValue) -> f64 {
     //! DeltaE 2000. This is a ridiculously complicated formula.
     let l_bar_prime = (c0.l + c1.l)/2.0;

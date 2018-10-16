@@ -222,12 +222,6 @@
 <span id="222">222</span>
 <span id="223">223</span>
 <span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Calculate Delta E (color difference) between two colors in CIE Lab space.</span>
 <span class="doccomment">//! </span>
@@ -383,12 +377,6 @@
       <span class="op">+</span> (<span class="ident">delta_chroma</span> <span class="op">/</span> <span class="ident">s_c</span>).<span class="ident">powi</span>(<span class="number">2</span>)
       <span class="op">+</span> (<span class="ident">delta_hue</span> <span class="op">/</span> <span class="ident">s_h</span>).<span class="ident">powi</span>(<span class="number">2</span>)
     ).<span class="ident">sqrt</span>()
-}
-
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">hprime</span>() {
-    <span class="kw">let</span> <span class="ident">lab</span> <span class="op">=</span> <span class="ident">LabValue</span>::<span class="ident">new</span>(<span class="number">0.0</span>, <span class="number">50.0</span>, <span class="number">23.0</span>);
-    <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">lab</span>.<span class="ident">to_lch</span>().<span class="ident">h</span>);
 }
 
 <span class="kw">fn</span> <span class="ident">delta_e_2000</span>(<span class="ident">c0</span>: <span class="kw-2">&amp;</span><span class="ident">LabValue</span>, <span class="ident">c1</span>:<span class="kw-2">&amp;</span><span class="ident">LabValue</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {

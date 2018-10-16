@@ -41,7 +41,7 @@ The binary included with this library is a command line application that calcula
 
 ---
 
-## Usage
+### Usage
 
 ```sh
 deltae [--method=<DE Method>] <L,a,b,> <L,a,b>
@@ -53,7 +53,7 @@ deltae [--method=<DE Method>] <L,a,b,> <L,a,b>
 deltae --method=de1976 89.73,1.88,-6.96 95.08,-0.17,-10.81
 ```
 
-## Install
+### Install
 
 ### * Requires rustc and cargo to build
 
@@ -63,7 +63,7 @@ cd deltae
 cargo install
 ```
 
-## Notes
+### Notes
 
 Calculates DE2000, DE1994 (Graphic Arts only), and DE1976. The Default is DE2000.
 

@@ -26,7 +26,7 @@ impl LabValue {
     }
 
     pub fn to_lch(&self) -> LchValue {
-        //! Convert Lab to Lch
+        //! Convert `LabValue` to `LchValue`
         let mut h: f64 = (self.b.atan2(self.a)).to_degrees();
 
         if h < 0.0 {
@@ -41,12 +41,22 @@ impl LabValue {
     }
 
     pub fn round_to(&self, places: i32) -> LabValue {
-        //! Round LchValue to nearest decimal places.
+        //! Round `LabValue` to nearest decimal places.
         Self {
             l: round_to(self.l, places),
             a: round_to(self.a, places),
             b: round_to(self.b, places),
         }       
+    }
+
+    pub fn to_a(&self) -> [f64; 3] {
+        //! Returns an array of [L, a, b]
+        [self.l, self.a, self.b]
+    }
+
+    pub fn to_vec(&self) -> Vec<f64> {
+        //! Returns a `Vec<f64>` of [L, a, b]
+        vec![self.l, self.a, self.b]
     }
 }
 
@@ -70,7 +80,7 @@ impl LchValue {
     }
 
     pub fn zero() -> Self {
-        //! New LchValue with a value of 0,0,0
+        //! New `LchValue` with a value of 0,0,0
         Self { l: 0.0, c: 0.0, h: 0.0 }
     }
 
@@ -95,6 +105,16 @@ impl LchValue {
             c: round_to(self.c, places),
             h: round_to(self.h, places),
         }       
+    }
+
+    pub fn to_a(&self) -> [f64; 3] {
+        //! Returns an array of [L, c, h]
+        [self.l, self.c, self.h]
+    }
+
+    pub fn to_vec(&self) -> Vec<f64> {
+        //! Returns a `Vec<f64>` of [L, c, h]
+        vec![self.l, self.c, self.h]
     }
 }
 
