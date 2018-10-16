@@ -29,7 +29,11 @@ fn main() {
 
     println!("{}: {}", de0.method, de0.value); // DE2000: 4.6913
 
-    let de1 = DeltaE::from("89.73, 1.88, -6.96", "95.08, -0.17, -10.81", "DE2000").unwrap();
+    let de1 = DeltaE::from(
+        "89.73, 1.88, -6.96",
+        "95.08, -0.17, -10.81",
+        "DE2000"
+    ).unwrap();
 
     assert_eq!(de0, de1.round_to(4));
 }
