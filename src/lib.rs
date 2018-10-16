@@ -1,3 +1,36 @@
+//! Calculate Delta E (color difference) between two colors in CIE Lab space.
+//! 
+//! # Examples
+//! 
+//! ```
+//! extern crate deltae;
+//! use deltae::color::LabValue;
+//! use deltae::{DeltaE, DEMethod::DE2000};
+//! 
+//! fn main() {
+//!     let lab0 = LabValue::from("89.73, 1.88, -6.96").unwrap();
+//!     let lab1 = LabValue {
+//!         l: 95.08,
+//!         a: -0.17,
+//!         b: -10.81,
+//!     };
+//! 
+//!     println!("{}", lab0); // [L:89.73, a:1.88, b:-6.96]
+//! 
+//!     let de0 = DeltaE::new(&lab0, &lab1, DE2000).round_to(4);
+//! 
+//!     println!("{}: {}", de0.method, de0.value); // DE2000: 4.6913
+//! 
+//!     let de1 = DeltaE::from(
+//!         "89.73, 1.88, -6.96",
+//!         "95.08, -0.17, -10.81",
+//!         "DE2000"
+//!     ).unwrap();
+//! 
+//!     assert_eq!(de0, de1.round_to(4));
+//! }
+//! ```
+
 use std::fmt;
 
 pub mod color;
