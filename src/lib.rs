@@ -19,7 +19,7 @@
 //! 
 //!     let de0 = DeltaE::new(&lab0, &lab1, DE2000).round_to(4);
 //! 
-//!     println!("{}: {}", de0.method, de0.value); // DE2000: 4.6913
+//!     println!("{}: {}", de0.method, de0.value); // DE2000: 5.3169
 //! 
 //!     let de1 = DeltaE::from(
 //!         "89.73, 1.88, -6.96",
@@ -129,20 +129,20 @@ impl fmt::Display for DEMethod {
     }
 }
 
-fn delta_e_1976(c0: &LabValue, c1: &LabValue) -> f64 {
+fn delta_e_1976(lab_0: &LabValue, lab_1: &LabValue) -> f64 {
     //! DeltaE 1976. Basic euclidian distance formula.
-    ( (c0.l - c1.l).powi(2) + (c0.a - c1.a).powi(2) + (c0.b - c1.b).powi(2) ).sqrt()
+    ( (lab_0.l - lab_1.l).powi(2) + (lab_0.a - lab_1.a).powi(2) + (lab_0.b - lab_1.b).powi(2) ).sqrt()
 }
 
-fn delta_e_1994(c0: &LabValue, c1: &LabValue) -> f64 {
+fn delta_e_1994(lab_0: &LabValue, lab_1: &LabValue) -> f64 {
     //! DeltaE 1994. Only does Graphic Arts mode at the moment.
     //! TODO: Add Textiles mode
-    let delta_l = c0.l - c1.l;
-    let chroma_0 = (c0.a.powi(2) + c0.b.powi(2)).sqrt();
-    let chroma_1 = (c1.a.powi(2) + c1.b.powi(2)).sqrt();
+    let delta_l = lab_0.l - lab_1.l;
+    let chroma_0 = (lab_0.a.powi(2) + lab_0.b.powi(2)).sqrt();
+    let chroma_1 = (lab_1.a.powi(2) + lab_1.b.powi(2)).sqrt();
     let delta_chroma = chroma_0 - chroma_1;
-    let delta_a = c0.a - c1.a;
-    let delta_b = c0.b - c1.b;
+    let delta_a = lab_0.a - lab_1.a;
+    let delta_b = lab_0.b - lab_1.b;
     let delta_hue = (delta_a.powi(2) + delta_b.powi(2) - delta_chroma.powi(2)).sqrt();
     let s_l = 1.0;
     let s_c = 1.0 + 0.045 * chroma_0;

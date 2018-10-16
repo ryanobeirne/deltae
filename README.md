@@ -27,7 +27,7 @@ fn main() {
 
     let de0 = DeltaE::new(&lab0, &lab1, DE2000).round_to(4);
 
-    println!("{}: {}", de0.method, de0.value); // DE2000: 4.6913
+    println!("{}: {}", de0.method, de0.value); // DE2000: 5.3169
 
     let de1 = DeltaE::from(
         "89.73, 1.88, -6.96",
