@@ -12,11 +12,24 @@ A rust library for interacting with and manipulating Lab and Lch colors and calc
 
 ```rust
 extern crate deltae;
-use deltae::*;
+use deltae::{DeltaE, DEMethod::DE2000};
+use deltae::color::LabValue;
 
 fn main() {
-    let de = DeltaE::parse("50,0,0", "50,0,0", "DE2000").unwrap();
-    println!("Delta E 2000: {}", de.round_to(4).value );
+    let lab0 = LabValue::from("89.73, 1.88, -6.96").unwrap();
+    let lab1 = LabValue {
+        l:95.08,
+        a: -0.17,
+        b: -10.81,
+    };
+
+    let de0 = DeltaE::new(&lab0, &lab1, DE2000).round_to(4);
+
+    println!("{}: {}", de0.method, de0.value);
+
+    let de1 = DeltaE::from("89.73, 1.88, -6.96", "95.08, -0.17, -10.81", "DE2000").unwrap();
+
+    assert_eq!(de0, de1.round_to(4));
 }
 ```
 
