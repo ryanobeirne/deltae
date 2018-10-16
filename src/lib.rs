@@ -154,25 +154,43 @@ fn delta_e_1994(c0: &LabValue, c1: &LabValue) -> f64 {
     ).sqrt()
 }
 
-fn delta_e_2000(c0: &LabValue, c1:&LabValue) -> f64 {
+fn get_h_prime(a: f64, b: f64) -> f64 {
+    let mut h_prime = b.atan2(a).to_degrees();
+    if h_prime < 0.0 {
+        h_prime += 360.0;
+    }
+    h_prime
+}
+
+fn delta_e_2000(lab_0: &LabValue, lab_1: &LabValue) -> f64 {
     //! DeltaE 2000. This is a ridiculously complicated formula.
-    let l_bar_prime = (c0.l + c1.l)/2.0;
-    let c_0 = (c0.a.powi(2) + c0.b.powi(2)).sqrt();
-    let c_1 = (c1.a.powi(2) + c1.b.powi(2)).sqrt();
-    let c_bar = (c_0 + c_1) / 2.0;
+    let chroma_0 = (lab_0.a.powi(2) + lab_0.b.powi(2)).sqrt();
+    let chroma_1 = (lab_1.a.powi(2) + lab_1.b.powi(2)).sqrt();
+
+    let c_bar = (chroma_0 + chroma_1) / 2.0;
+
     let g = 0.5 * (1.0 - ( c_bar.powi(7) / (c_bar.powi(7) + 25_f64.powi(7)) ).sqrt());
-    let a_prime_0 = c0.a * (1.0 + g);
-    let a_prime_1 = c1.a * (1.0 + g);
-    let c_prime_0 = (a_prime_0.powi(2) + c0.b.powi(2)).sqrt();
-    let c_prime_1 = (a_prime_1.powi(2) + c1.b.powi(2)).sqrt();
+
+    let a_prime_0 = lab_0.a * (1.0 + g);
+    let a_prime_1 = lab_1.a * (1.0 + g);
+
+    let c_prime_0 = (a_prime_0.powi(2) + lab_0.b.powi(2)).sqrt();
+    let c_prime_1 = (a_prime_1.powi(2) + lab_1.b.powi(2)).sqrt();
+
+    let l_bar_prime = (lab_0.l + lab_1.l)/2.0;
     let c_bar_prime = (c_prime_0 + c_prime_1) / 2.0;
-    let h_prime_0 = c0.to_lch().h;
-    let h_prime_1 = c1.to_lch().h;
-    let mut h_bar_prime = h_prime_0 - h_prime_1;
-    if h_bar_prime > 180.0 {
-        h_bar_prime = (h_prime_0 + h_prime_1 + 360.0) / 2.0;
+
+    let h_prime_0 = get_h_prime(a_prime_0, lab_0.b);
+    let h_prime_1 = get_h_prime(a_prime_1, lab_1.b);
+
+    let h_bar_prime = if (h_prime_0 - h_prime_1).abs() > 180.0 {
+        if (h_prime_0 - h_prime_1) < 360.0 {
+            (h_prime_0 + h_prime_1 + 360.0) / 2.0
+        } else {
+            (h_prime_0 + h_prime_1 - 360.0) / 2.0
+        }
     } else {
-        h_bar_prime = (h_prime_0 + h_prime_1) / 2.0;
+        (h_prime_0 + h_prime_1) / 2.0
     };
 
     let t = 1.0 - 0.17 * ((      h_bar_prime - 30.0).to_radians()).cos()
@@ -187,7 +205,7 @@ fn delta_e_2000(c0: &LabValue, c1:&LabValue) -> f64 {
         delta_h -= 360.0;
     };
 
-    let delta_l_prime = c1.l - c0.l;
+    let delta_l_prime = lab_1.l - lab_0.l;
     let delta_c_prime = c_prime_1 - c_prime_0;
     let delta_h_prime = 2.0 * (c_prime_0 * c_prime_1).sqrt() * (delta_h.to_radians() / 2.0).sin();
 
@@ -206,13 +224,14 @@ fn delta_e_2000(c0: &LabValue, c1:&LabValue) -> f64 {
     let k_c = 1.0;
     let k_h = 1.0;
 
-    //Return the Delta E 2000
-    (
+    let de2000 = (
         (delta_l_prime/(k_l*s_l)).powi(2)
       + (delta_c_prime/(k_c*s_c)).powi(2)
       + (delta_h_prime/(k_h*s_h)).powi(2)
       + (r_t * (delta_c_prime/(k_c*s_c)) * (delta_h_prime/(k_h*s_h)))
-    ).sqrt()
+    ).sqrt();
+
+    de2000
 }
 
 //fn delta_e_CMC1(c1: &LabValue, c2:&LabValue) -> f64 {

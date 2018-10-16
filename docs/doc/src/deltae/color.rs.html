@@ -207,14 +207,8 @@
 <span id="207">207</span>
 <span id="208">208</span>
 <span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
-<span id="215">215</span>
 </pre><pre class="rust ">
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">round_to</span>;
+<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span>;
 
@@ -243,16 +237,10 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_lch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">LchValue</span> {
         <span class="doccomment">//! Convert `LabValue` to `LchValue`</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span>: <span class="ident">f64</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">b</span>.<span class="ident">atan2</span>(<span class="self">self</span>.<span class="ident">a</span>)).<span class="ident">to_degrees</span>();
-
-        <span class="kw">if</span> <span class="ident">h</span> <span class="op">&lt;</span> <span class="number">0.0</span> {
-            <span class="ident">h</span> <span class="op">+=</span> <span class="number">360.0</span>;
-        };
-
         <span class="ident">LchValue</span> {
             <span class="ident">l</span>: <span class="self">self</span>.<span class="ident">l</span>,
             <span class="ident">c</span>: ( <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">powi</span>(<span class="number">2</span>) ).<span class="ident">sqrt</span>(),
-            <span class="ident">h</span>: <span class="ident">h</span>
+            <span class="ident">h</span>: <span class="ident">get_h_prime</span>(<span class="self">self</span>.<span class="ident">a</span>, <span class="self">self</span>.<span class="ident">b</span>),
         }
     }
 

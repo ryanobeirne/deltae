@@ -222,6 +222,25 @@
 <span id="222">222</span>
 <span id="223">223</span>
 <span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! Calculate Delta E (color difference) between two colors in CIE Lab space.</span>
 <span class="doccomment">//! </span>
@@ -379,25 +398,43 @@
     ).<span class="ident">sqrt</span>()
 }
 
-<span class="kw">fn</span> <span class="ident">delta_e_2000</span>(<span class="ident">c0</span>: <span class="kw-2">&amp;</span><span class="ident">LabValue</span>, <span class="ident">c1</span>:<span class="kw-2">&amp;</span><span class="ident">LabValue</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
+<span class="kw">fn</span> <span class="ident">get_h_prime</span>(<span class="ident">a</span>: <span class="ident">f64</span>, <span class="ident">b</span>: <span class="ident">f64</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h_prime</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">atan2</span>(<span class="ident">a</span>).<span class="ident">to_degrees</span>();
+    <span class="kw">if</span> <span class="ident">h_prime</span> <span class="op">&lt;</span> <span class="number">0.0</span> {
+        <span class="ident">h_prime</span> <span class="op">+=</span> <span class="number">360.0</span>;
+    }
+    <span class="ident">h_prime</span>
+}
+
+<span class="kw">fn</span> <span class="ident">delta_e_2000</span>(<span class="ident">lab_0</span>: <span class="kw-2">&amp;</span><span class="ident">LabValue</span>, <span class="ident">lab_1</span>: <span class="kw-2">&amp;</span><span class="ident">LabValue</span>) <span class="op">-&gt;</span> <span class="ident">f64</span> {
     <span class="doccomment">//! DeltaE 2000. This is a ridiculously complicated formula.</span>
-    <span class="kw">let</span> <span class="ident">l_bar_prime</span> <span class="op">=</span> (<span class="ident">c0</span>.<span class="ident">l</span> <span class="op">+</span> <span class="ident">c1</span>.<span class="ident">l</span>)<span class="op">/</span><span class="number">2.0</span>;
-    <span class="kw">let</span> <span class="ident">c_0</span> <span class="op">=</span> (<span class="ident">c0</span>.<span class="ident">a</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">c0</span>.<span class="ident">b</span>.<span class="ident">powi</span>(<span class="number">2</span>)).<span class="ident">sqrt</span>();
-    <span class="kw">let</span> <span class="ident">c_1</span> <span class="op">=</span> (<span class="ident">c1</span>.<span class="ident">a</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">c1</span>.<span class="ident">b</span>.<span class="ident">powi</span>(<span class="number">2</span>)).<span class="ident">sqrt</span>();
-    <span class="kw">let</span> <span class="ident">c_bar</span> <span class="op">=</span> (<span class="ident">c_0</span> <span class="op">+</span> <span class="ident">c_1</span>) <span class="op">/</span> <span class="number">2.0</span>;
+    <span class="kw">let</span> <span class="ident">chroma_0</span> <span class="op">=</span> (<span class="ident">lab_0</span>.<span class="ident">a</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">lab_0</span>.<span class="ident">b</span>.<span class="ident">powi</span>(<span class="number">2</span>)).<span class="ident">sqrt</span>();
+    <span class="kw">let</span> <span class="ident">chroma_1</span> <span class="op">=</span> (<span class="ident">lab_1</span>.<span class="ident">a</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">lab_1</span>.<span class="ident">b</span>.<span class="ident">powi</span>(<span class="number">2</span>)).<span class="ident">sqrt</span>();
+
+    <span class="kw">let</span> <span class="ident">c_bar</span> <span class="op">=</span> (<span class="ident">chroma_0</span> <span class="op">+</span> <span class="ident">chroma_1</span>) <span class="op">/</span> <span class="number">2.0</span>;
+
     <span class="kw">let</span> <span class="ident">g</span> <span class="op">=</span> <span class="number">0.5</span> <span class="op">*</span> (<span class="number">1.0</span> <span class="op">-</span> ( <span class="ident">c_bar</span>.<span class="ident">powi</span>(<span class="number">7</span>) <span class="op">/</span> (<span class="ident">c_bar</span>.<span class="ident">powi</span>(<span class="number">7</span>) <span class="op">+</span> <span class="number">25_f64</span>.<span class="ident">powi</span>(<span class="number">7</span>)) ).<span class="ident">sqrt</span>());
-    <span class="kw">let</span> <span class="ident">a_prime_0</span> <span class="op">=</span> <span class="ident">c0</span>.<span class="ident">a</span> <span class="op">*</span> (<span class="number">1.0</span> <span class="op">+</span> <span class="ident">g</span>);
-    <span class="kw">let</span> <span class="ident">a_prime_1</span> <span class="op">=</span> <span class="ident">c1</span>.<span class="ident">a</span> <span class="op">*</span> (<span class="number">1.0</span> <span class="op">+</span> <span class="ident">g</span>);
-    <span class="kw">let</span> <span class="ident">c_prime_0</span> <span class="op">=</span> (<span class="ident">a_prime_0</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">c0</span>.<span class="ident">b</span>.<span class="ident">powi</span>(<span class="number">2</span>)).<span class="ident">sqrt</span>();
-    <span class="kw">let</span> <span class="ident">c_prime_1</span> <span class="op">=</span> (<span class="ident">a_prime_1</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">c1</span>.<span class="ident">b</span>.<span class="ident">powi</span>(<span class="number">2</span>)).<span class="ident">sqrt</span>();
+
+    <span class="kw">let</span> <span class="ident">a_prime_0</span> <span class="op">=</span> <span class="ident">lab_0</span>.<span class="ident">a</span> <span class="op">*</span> (<span class="number">1.0</span> <span class="op">+</span> <span class="ident">g</span>);
+    <span class="kw">let</span> <span class="ident">a_prime_1</span> <span class="op">=</span> <span class="ident">lab_1</span>.<span class="ident">a</span> <span class="op">*</span> (<span class="number">1.0</span> <span class="op">+</span> <span class="ident">g</span>);
+
+    <span class="kw">let</span> <span class="ident">c_prime_0</span> <span class="op">=</span> (<span class="ident">a_prime_0</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">lab_0</span>.<span class="ident">b</span>.<span class="ident">powi</span>(<span class="number">2</span>)).<span class="ident">sqrt</span>();
+    <span class="kw">let</span> <span class="ident">c_prime_1</span> <span class="op">=</span> (<span class="ident">a_prime_1</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">lab_1</span>.<span class="ident">b</span>.<span class="ident">powi</span>(<span class="number">2</span>)).<span class="ident">sqrt</span>();
+
+    <span class="kw">let</span> <span class="ident">l_bar_prime</span> <span class="op">=</span> (<span class="ident">lab_0</span>.<span class="ident">l</span> <span class="op">+</span> <span class="ident">lab_1</span>.<span class="ident">l</span>)<span class="op">/</span><span class="number">2.0</span>;
     <span class="kw">let</span> <span class="ident">c_bar_prime</span> <span class="op">=</span> (<span class="ident">c_prime_0</span> <span class="op">+</span> <span class="ident">c_prime_1</span>) <span class="op">/</span> <span class="number">2.0</span>;
-    <span class="kw">let</span> <span class="ident">h_prime_0</span> <span class="op">=</span> <span class="ident">c0</span>.<span class="ident">to_lch</span>().<span class="ident">h</span>;
-    <span class="kw">let</span> <span class="ident">h_prime_1</span> <span class="op">=</span> <span class="ident">c1</span>.<span class="ident">to_lch</span>().<span class="ident">h</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h_bar_prime</span> <span class="op">=</span> <span class="ident">h_prime_0</span> <span class="op">-</span> <span class="ident">h_prime_1</span>;
-    <span class="kw">if</span> <span class="ident">h_bar_prime</span> <span class="op">&gt;</span> <span class="number">180.0</span> {
-        <span class="ident">h_bar_prime</span> <span class="op">=</span> (<span class="ident">h_prime_0</span> <span class="op">+</span> <span class="ident">h_prime_1</span> <span class="op">+</span> <span class="number">360.0</span>) <span class="op">/</span> <span class="number">2.0</span>;
+
+    <span class="kw">let</span> <span class="ident">h_prime_0</span> <span class="op">=</span> <span class="ident">get_h_prime</span>(<span class="ident">a_prime_0</span>, <span class="ident">lab_0</span>.<span class="ident">b</span>);
+    <span class="kw">let</span> <span class="ident">h_prime_1</span> <span class="op">=</span> <span class="ident">get_h_prime</span>(<span class="ident">a_prime_1</span>, <span class="ident">lab_1</span>.<span class="ident">b</span>);
+
+    <span class="kw">let</span> <span class="ident">h_bar_prime</span> <span class="op">=</span> <span class="kw">if</span> (<span class="ident">h_prime_0</span> <span class="op">-</span> <span class="ident">h_prime_1</span>).<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="number">180.0</span> {
+        <span class="kw">if</span> (<span class="ident">h_prime_0</span> <span class="op">-</span> <span class="ident">h_prime_1</span>) <span class="op">&lt;</span> <span class="number">360.0</span> {
+            (<span class="ident">h_prime_0</span> <span class="op">+</span> <span class="ident">h_prime_1</span> <span class="op">+</span> <span class="number">360.0</span>) <span class="op">/</span> <span class="number">2.0</span>
+        } <span class="kw">else</span> {
+            (<span class="ident">h_prime_0</span> <span class="op">+</span> <span class="ident">h_prime_1</span> <span class="op">-</span> <span class="number">360.0</span>) <span class="op">/</span> <span class="number">2.0</span>
+        }
     } <span class="kw">else</span> {
-        <span class="ident">h_bar_prime</span> <span class="op">=</span> (<span class="ident">h_prime_0</span> <span class="op">+</span> <span class="ident">h_prime_1</span>) <span class="op">/</span> <span class="number">2.0</span>;
+        (<span class="ident">h_prime_0</span> <span class="op">+</span> <span class="ident">h_prime_1</span>) <span class="op">/</span> <span class="number">2.0</span>
     };
 
     <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="number">1.0</span> <span class="op">-</span> <span class="number">0.17</span> <span class="op">*</span> ((      <span class="ident">h_bar_prime</span> <span class="op">-</span> <span class="number">30.0</span>).<span class="ident">to_radians</span>()).<span class="ident">cos</span>()
@@ -412,7 +449,7 @@
         <span class="ident">delta_h</span> <span class="op">-=</span> <span class="number">360.0</span>;
     };
 
-    <span class="kw">let</span> <span class="ident">delta_l_prime</span> <span class="op">=</span> <span class="ident">c1</span>.<span class="ident">l</span> <span class="op">-</span> <span class="ident">c0</span>.<span class="ident">l</span>;
+    <span class="kw">let</span> <span class="ident">delta_l_prime</span> <span class="op">=</span> <span class="ident">lab_1</span>.<span class="ident">l</span> <span class="op">-</span> <span class="ident">lab_0</span>.<span class="ident">l</span>;
     <span class="kw">let</span> <span class="ident">delta_c_prime</span> <span class="op">=</span> <span class="ident">c_prime_1</span> <span class="op">-</span> <span class="ident">c_prime_0</span>;
     <span class="kw">let</span> <span class="ident">delta_h_prime</span> <span class="op">=</span> <span class="number">2.0</span> <span class="op">*</span> (<span class="ident">c_prime_0</span> <span class="op">*</span> <span class="ident">c_prime_1</span>).<span class="ident">sqrt</span>() <span class="op">*</span> (<span class="ident">delta_h</span>.<span class="ident">to_radians</span>() <span class="op">/</span> <span class="number">2.0</span>).<span class="ident">sin</span>();
 
@@ -431,13 +468,14 @@
     <span class="kw">let</span> <span class="ident">k_c</span> <span class="op">=</span> <span class="number">1.0</span>;
     <span class="kw">let</span> <span class="ident">k_h</span> <span class="op">=</span> <span class="number">1.0</span>;
 
-    <span class="comment">//Return the Delta E 2000</span>
-    (
+    <span class="kw">let</span> <span class="ident">de2000</span> <span class="op">=</span> (
         (<span class="ident">delta_l_prime</span><span class="op">/</span>(<span class="ident">k_l</span><span class="kw-2">*</span><span class="ident">s_l</span>)).<span class="ident">powi</span>(<span class="number">2</span>)
       <span class="op">+</span> (<span class="ident">delta_c_prime</span><span class="op">/</span>(<span class="ident">k_c</span><span class="kw-2">*</span><span class="ident">s_c</span>)).<span class="ident">powi</span>(<span class="number">2</span>)
       <span class="op">+</span> (<span class="ident">delta_h_prime</span><span class="op">/</span>(<span class="ident">k_h</span><span class="kw-2">*</span><span class="ident">s_h</span>)).<span class="ident">powi</span>(<span class="number">2</span>)
       <span class="op">+</span> (<span class="ident">r_t</span> <span class="op">*</span> (<span class="ident">delta_c_prime</span><span class="op">/</span>(<span class="ident">k_c</span><span class="kw-2">*</span><span class="ident">s_c</span>)) <span class="op">*</span> (<span class="ident">delta_h_prime</span><span class="op">/</span>(<span class="ident">k_h</span><span class="kw-2">*</span><span class="ident">s_h</span>)))
-    ).<span class="ident">sqrt</span>()
+    ).<span class="ident">sqrt</span>();
+
+    <span class="ident">de2000</span>
 }
 
 <span class="comment">//fn delta_e_CMC1(c1: &amp;LabValue, c2:&amp;LabValue) -&gt; f64 {</span>

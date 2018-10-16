@@ -1,4 +1,4 @@
-use super::round_to;
+use super::*;
 use std::fmt;
 use std::error::Error;
 
@@ -27,16 +27,10 @@ impl LabValue {
 
     pub fn to_lch(&self) -> LchValue {
         //! Convert `LabValue` to `LchValue`
-        let mut h: f64 = (self.b.atan2(self.a)).to_degrees();
-
-        if h < 0.0 {
-            h += 360.0;
-        };
-
         LchValue {
             l: self.l,
             c: ( self.a.powi(2) + self.b.powi(2) ).sqrt(),
-            h: h
+            h: get_h_prime(self.a, self.b),
         }
     }
 
