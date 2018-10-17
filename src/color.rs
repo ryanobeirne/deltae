@@ -1,3 +1,40 @@
+//! Manipulate and convert CIE L\*a\*b\* and Lch colors.
+//! 
+//! Lab:
+//! * L: Lightness     (0...100)
+//! * a: green-magenta (-128...128)
+//! * b: blue-yellow   (-128...128)
+//! 
+//! Lch:
+//! * L: Lightness (0...100)
+//! * c: Chroma    (0...181.0139)
+//! * h: Hue       (0...360°)
+//!     
+//! # Examples
+//! 
+//! ```
+//! extern crate deltae;
+//! use deltae::color::{LabValue, LchValue};
+//! 
+//! fn main() {
+//!     let lab0 = LabValue::from("95.08, -0.17, -10.81").unwrap();
+//!     let lab1 = LabValue {
+//!         l: 95.08,
+//!         a: -0.17,
+//!         b: -10.81,
+//!     };
+//! 
+//!     assert_eq!(lab0, lab1);
+//! 
+//!     let lch0 = lab0.to_lch();
+//!     let lab2 = lch0.to_lab();
+//! 
+//!     println!("{}", lch0); // [L:89.73, c:7.2094, h:285.1157]
+//! 
+//!     assert_eq!(lab0.round_to(4), lab2.round_to(4));
+//! }
+//! ```
+
 use super::*;
 use std::fmt;
 use std::error::Error;

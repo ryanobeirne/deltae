@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["DEMethod",""]],"mod":[["color",""]],"struct":[["DeltaE",""]]});
+initSidebarItems({"enum":[["DEMethod",""]],"mod":[["color","Manipulate and convert CIE L*a*b* and Lch colors."]],"struct":[["DeltaE",""]]});

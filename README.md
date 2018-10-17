@@ -4,9 +4,14 @@
 
 A rust library for interacting with and manipulating Lab and Lch colors and calculating DeltaE (color difference).
 
----
-
+Check out the documentation here:
 [Rust API Documentation](https://robeirne.github.io/deltae)
+
+...or compile it yourself:
+
+```sh
+cargo doc --open
+```
 
 ### Examples
 
@@ -36,14 +41,21 @@ fn main() {
     ).unwrap();
 
     assert_eq!(de0, de1.round_to(4));
+
+    let lch0 = lab0.to_lch();
+    let lab2 = lch0.to_lab();
+
+    println!("{}", lch0); // [L:89.73, c:7.2094, h:285.1157]
+
+    assert_eq!(lab0.round_to(4), lab2.round_to(4));
 }
 ```
+
+---
 
 ## Binary
 
 The binary included with this library is a command line application that calculates Delta E between to Lab colors.
-
----
 
 ### Usage
 
@@ -59,7 +71,7 @@ deltae --method=de1976 89.73,1.88,-6.96 95.08,-0.17,-10.81
 
 ### Install
 
-### * Requires rustc and cargo to build
+#### Requires rustc and cargo to build
 
 ```sh
 git clone https://github.com/robeirne/deltae

@@ -4,9 +4,9 @@
 //! 
 //! ```
 //! extern crate deltae;
-//! use deltae::color::LabValue;
 //! use deltae::{DeltaE, DEMethod::DE2000};
-//! 
+//! use deltae::color::LabValue;
+//!
 //! fn main() {
 //!     let lab0 = LabValue::from("89.73, 1.88, -6.96").unwrap();
 //!     let lab1 = LabValue {
@@ -14,20 +14,27 @@
 //!         a: -0.17,
 //!         b: -10.81,
 //!     };
-//! 
+//!
 //!     println!("{}", lab0); // [L:89.73, a:1.88, b:-6.96]
-//! 
+//!
 //!     let de0 = DeltaE::new(&lab0, &lab1, DE2000).round_to(4);
-//! 
+//!
 //!     println!("{}: {}", de0.method, de0.value); // DE2000: 5.3169
-//! 
+//!
 //!     let de1 = DeltaE::from(
 //!         "89.73, 1.88, -6.96",
 //!         "95.08, -0.17, -10.81",
 //!         "DE2000"
 //!     ).unwrap();
-//! 
+//!
 //!     assert_eq!(de0, de1.round_to(4));
+//!
+//!     let lch0 = lab0.to_lch();
+//!     let lab2 = lch0.to_lab();
+//!
+//!     println!("{}", lch0); // [L:89.73, c:7.2094, h:285.1157]
+//!
+//!     assert_eq!(lab0.round_to(4), lab2.round_to(4));
 //! }
 //! ```
 
