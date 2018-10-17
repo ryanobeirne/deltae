@@ -47,9 +47,10 @@ pub struct LabValue {
 }
 
 impl LabValue {
-    pub fn new(l: f64, a: f64, b: f64) -> Self {
+    pub fn new(l: f64, a: f64, b: f64) -> ValueResult<Self> {
         //! New `LabValue` from 3 `f64`s
-        Self{l, a, b}
+        let lab = Self{l, a, b};
+        validate_lab(lab)
     }
 
     pub fn zero() -> Self {
@@ -57,9 +58,17 @@ impl LabValue {
         Self { l: 0.0, a: 0.0, b: 0.0 }
     }
 
-    pub fn from(s: &str) -> ValueResult<Self> {
-        //! Parse `LabValue` from `&str`
-        Ok(string_to_lab(s)?)
+    pub fn from(lab_string: &str) -> ValueResult<Self> {
+        //! New `LabValue` from `&str`
+        let split = parse_str_to_vecf64(lab_string, 3)?;
+
+        let lab = Self {
+            l: split[0],
+            a: split[1],
+            b: split[2],
+        };
+
+        validate_lab(lab)
     }
 
     pub fn to_lch(&self) -> LchValue {
@@ -105,9 +114,10 @@ pub struct LchValue {
 }
 
 impl LchValue {
-    pub fn new(l: f64, c: f64, h: f64) -> Self {
+    pub fn new(l: f64, c: f64, h: f64) -> ValueResult<Self> {
         //! New `LchValue` from 3 `f64`s
-        Self {l, c, h}
+        let lch = Self {l, c, h};
+        validate_lch(lch)
     }
 
     pub fn zero() -> Self {
@@ -115,9 +125,17 @@ impl LchValue {
         Self { l: 0.0, c: 0.0, h: 0.0 }
     }
 
-    pub fn from(s: &str) -> ValueResult<Self> {
-        //! Parse `LchValue` from `&str`
-        Ok(string_to_lch(s)?)
+    pub fn from(lch_string: &str) -> ValueResult<Self> {
+        //! New `LchValue` from `&str`
+        let split = parse_str_to_vecf64(lch_string, 3)?;
+
+        let lch = Self {
+            l: split[0],
+            c: split[1],
+            h: split[2],
+        };
+
+        validate_lch(lch)
     }
 
     pub fn to_lab(&self) -> LabValue {
@@ -176,10 +194,6 @@ impl Error for ValueError {
             ValueError::BadFormat   => "Value is malformed!",
         }
     }
-
-    fn cause(&self) -> Option<&Error> {
-        Some(self)
-    }
 }
 
 fn parse_str_to_vecf64(s: &str, length: usize) -> Result<Vec<f64>, ValueError> {
@@ -205,42 +219,26 @@ fn parse_str_to_vecf64(s: &str, length: usize) -> Result<Vec<f64>, ValueError> {
     Ok(split)
 }
 
-fn string_to_lab(lab_string: &str) -> ValueResult<LabValue> {
-    let split = parse_str_to_vecf64(lab_string, 3)?;
-
+fn validate_lab(lab: LabValue) -> ValueResult<LabValue> {
     // Check that the Lab values are in the proper range or Error
-    if  split[0] < 0.0    || split[0] > 100.0 ||
-        split[1] < -128.0 || split[1] > 128.0 ||
-        split[2] < -128.0 || split[2] > 128.0
+    if  lab.l < 0.0    || lab.l > 100.0 ||
+        lab.a < -128.0 || lab.a > 128.0 ||
+        lab.b < -128.0 || lab.b > 128.0
     {
-        return Err(ValueError::OutOfBounds);
-    };
-
-    let lab = LabValue {
-        l: split[0],
-        a: split[1],
-        b: split[2],
-    };
-
-    Ok(lab)
+        Err(ValueError::OutOfBounds)
+    } else {
+        Ok(lab)
+    }
 }
 
-fn string_to_lch(lch_string: &str) -> ValueResult<LchValue> {
-    let split = parse_str_to_vecf64(lch_string, 3)?;
-
+fn validate_lch(lch: LchValue) -> ValueResult<LchValue> {
     // Check that the Lab values are in the proper range or Error
-    if  split[0] < 0.0 || split[0] > 100.0 ||
-        split[1] < 0.0 || split[1] > (128_f64.powi(2) + 128_f64.powi(2)).sqrt() ||
-        split[2] < 0.0 || split[2] > 360.0
+    if  lch.l < 0.0 || lch.l > 100.0 ||
+        lch.c < 0.0 || lch.c > (128_f64.powi(2) + 128_f64.powi(2)).sqrt() ||
+        lch.h < 0.0 || lch.h > 360.0
     {
-        return Err(ValueError::OutOfBounds);
-    };
-
-    let lch = LchValue {
-        l: split[0],
-        c: split[1],
-        h: split[2],
-    };
-
-    Ok(lch)
+        Err(ValueError::OutOfBounds)
+    } else {
+        Ok(lch)
+    }
 }
