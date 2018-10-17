@@ -53,9 +53,10 @@ impl DeltaE {
     pub fn new(lab_0: &LabValue, lab_1: &LabValue, method: DEMethod) -> DeltaE {
     //! New `DeltaE` from `LabValues` and `DEMethod`.
         let value = match method {
-            DEMethod::DE1976 => delta_e_1976(lab_0, lab_1),
-            DEMethod::DE1994 => delta_e_1994(lab_0, lab_1),
-            DEMethod::DE2000 => delta_e_2000(lab_0, lab_1),
+            DEMethod::DE2000  => delta_e_2000(lab_0, lab_1),
+            DEMethod::DE1994  => delta_e_1994(lab_0, lab_1, false),
+            DEMethod::DE1994T => delta_e_1994(lab_0, lab_1, true),
+            DEMethod::DE1976  => delta_e_1976(lab_0, lab_1),
         };
 
         let color0 = lab_0.to_owned();
@@ -101,6 +102,7 @@ fn round_to(val: f64, places: i32) -> f64 {
 pub enum DEMethod{
     DE2000,
     DE1994,
+    DE1994T,
     DE1976,
     // DECMC1,
     // DECMC2,
@@ -110,9 +112,11 @@ impl DEMethod {
     pub fn from(string: &str) -> Self {
         //! Parse `DEMethod` from `&str`.
         match string.to_lowercase().as_ref() {
-            "de1976" | "de76" | "1976" | "76" => DEMethod::DE1976,
-            "de2000" | "de00" | "2000" | "00" => DEMethod::DE2000,
-            "de1994" | "de94" | "1994" | "94" => DEMethod::DE1994,
+            "de2000"  | "de00"  | "2000"  | "00"  => DEMethod::DE2000,
+            "de1976"  | "de76"  | "1976"  | "76"  => DEMethod::DE1976,
+            "de1994"  | "de94"  | "1994"  | "94" |
+            "de1994g" | "de94g" | "1994g" | "94g" => DEMethod::DE1994,
+            "de1994t" | "de94t" | "1994t" | "94t" => DEMethod::DE1994T,
             // "decmc1" | "cmc1" | "cmc"         => DEMethod::DECMC1,
             // "decmc2" | "cmc2"                 => DEMethod::DECMC1,
             _ => {
@@ -134,9 +138,7 @@ fn delta_e_1976(lab_0: &LabValue, lab_1: &LabValue) -> f64 {
     ( (lab_0.l - lab_1.l).powi(2) + (lab_0.a - lab_1.a).powi(2) + (lab_0.b - lab_1.b).powi(2) ).sqrt()
 }
 
-fn delta_e_1994(lab_0: &LabValue, lab_1: &LabValue) -> f64 {
-    //! DeltaE 1994. Only does Graphic Arts mode at the moment.
-    //! TODO: Add Textiles mode
+fn delta_e_1994(lab_0: &LabValue, lab_1: &LabValue, textiles: bool) -> f64 {
     let delta_l = lab_0.l - lab_1.l;
     let chroma_0 = (lab_0.a.powi(2) + lab_0.b.powi(2)).sqrt();
     let chroma_1 = (lab_1.a.powi(2) + lab_1.b.powi(2)).sqrt();
@@ -144,11 +146,24 @@ fn delta_e_1994(lab_0: &LabValue, lab_1: &LabValue) -> f64 {
     let delta_a = lab_0.a - lab_1.a;
     let delta_b = lab_0.b - lab_1.b;
     let delta_hue = (delta_a.powi(2) + delta_b.powi(2) - delta_chroma.powi(2)).sqrt();
-    let s_l = 1.0;
-    let s_c = 1.0 + 0.045 * chroma_0;
-    let s_h = 1.0 + 0.015 * chroma_0;
 
-    (   (delta_l / s_l).powi(2)
+    struct K {
+        kl: f64,
+        k1: f64,
+        k2: f64,
+    }
+
+    let k = if textiles {
+        K {kl: 2.0, k1: 0.048, k2: 0.014}
+    } else {
+        K {kl: 1.0, k1: 0.045, k2: 0.015}
+    };
+
+    let s_l = 1.0;
+    let s_c = 1.0 + k.k1 * chroma_0;
+    let s_h = 1.0 + k.k2 * chroma_0;
+
+    (   (delta_l / k.kl * s_l).powi(2)
       + (delta_chroma / s_c).powi(2)
       + (delta_hue / s_h).powi(2)
     ).sqrt()
