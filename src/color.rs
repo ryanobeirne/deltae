@@ -1,14 +1,16 @@
 //! Manipulate and convert CIE L\*a\*b\* and Lch colors.
 //! 
-//! Lab:
-//! * L: Lightness     (0...100)
-//! * a: green-magenta (-128...128)
-//! * b: blue-yellow   (-128...128)
+//! ### Lab
 //! 
-//! Lch:
-//! * L: Lightness (0...100)
-//! * c: Chroma    (0...181.0139)
-//! * h: Hue       (0...360°)
+//! * **L**: Lightness     (0...100)
+//! * **a**: green-magenta (-128...128)
+//! * **b**: blue-yellow   (-128...128)
+//! 
+//! ### Lch
+//! 
+//! * **L**: Lightness (0...100)
+//! * **c**: Chroma    (0...181.0139)
+//! * **h**: Hue       (0...360°)
 //!     
 //! # Examples
 //! 
