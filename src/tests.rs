@@ -105,45 +105,18 @@ fn lch_string() {
     }
 }
 
-fn compare_de1976(expected: f64, lab0: &[f64; 3], lab1: &[f64; 3]) {
-    let color_0 = LabValue {
-        l: lab0[0],
-        a: lab0[1],
-        b: lab0[2],
-    };
+fn compare_de(method: DEMethod, expected: f64, reference: &[f64; 3], sample: &[f64; 3]) {
+    let lab0 = LabValue::new(reference[0], reference[1], reference[2]).unwrap();
+    let lab1 = LabValue::new(sample[0],    sample[1],    sample[2])   .unwrap();
 
-    let color_1 = LabValue {
-        l: lab1[0],
-        a: lab1[1],
-        b: lab1[2],
-    };
-
-    let de = DeltaE::new(&color_0, &color_1, DEMethod::DE1976).round_to(4).value;
-
-    assert_eq!(expected, de);
-}
-
-fn compare_de2000(expected: f64, lab0: &[f64; 3], lab1: &[f64; 3]) {
-    let color_0 = LabValue {
-        l: lab0[0],
-        a: lab0[1],
-        b: lab0[2],
-    };
-
-    let color_1 = LabValue {
-        l: lab1[0],
-        a: lab1[1],
-        b: lab1[2],
-    };
-
-    let de = DeltaE::new(&color_0, &color_1, DEMethod::DE2000).round_to(4).value;
+    let de = DeltaE::new(&lab0, &lab1, method).round_to(4).value;
 
     assert_eq!(expected, de);
 }
 
 #[test]
 fn de1976_test_set() {
-    let set: Vec<(f64, &[f64; 3], &[f64; 3])> = vec![
+    let set = vec![
         (0.0000,   &[0.0000,  0.0000,    0.0000  ], &[0.0000,    0.0000,    0.0000  ]),
         (5.0000,   &[0.0000,  0.0000,    0.0000  ], &[0.0000,    3.0000,    4.0000  ]),
         (5.0000,   &[0.0000,  0.0000,    0.0000  ], &[0.0000,   -3.0000,   -4.0000  ]),
@@ -153,8 +126,8 @@ fn de1976_test_set() {
         (375.5955, &[0.0000, -128.0000, -128.0000], &[100.0000,  128.0000,  128.0000])
     ];
 
-    for pair in set {
-        compare_de1976(pair.0, pair.1, pair.2);
+    for (expected, reference, sample) in set {
+        compare_de(DEMethod::DE1976, expected, reference, sample);
     }
 }
 
@@ -167,8 +140,7 @@ fn de1976_test_set() {
 
 #[test]
 fn de2000_test_set() {
-    let set: Vec<(f64, &[f64; 3], &[f64; 3])> = vec![
-        //(exptected, &[lab_0], &[lab_1])
+    let set = vec![
         (0.0000,   &[0.0000,   0.0000,   0.0000 ], &[0.0000,   0.0000,   0.0000 ]),
         (0.0000,   &[99.5000,  0.0050,  -0.0100 ], &[99.5000,  0.0050,  -0.0100 ]),
         (100.0000, &[100.0000, 0.0050,  -0.0100 ], &[0.0000,   0.0000,   0.0000 ]),
@@ -207,7 +179,7 @@ fn de2000_test_set() {
         (0.9082,   &[2.0776,   0.0795,  -1.1350 ], &[0.9033,  -0.0636,   -0.5514])
     ];
 
-    for pair in set {
-        compare_de2000(pair.0, pair.1, pair.2);
+    for (expected, reference, sample) in set {
+        compare_de(DEMethod::DE2000, expected, reference, sample);
     }
 }
