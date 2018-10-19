@@ -82,6 +82,22 @@ impl LabValue {
         }
     }
 
+    pub fn chroma(&self) -> f64 {
+        self.to_lch().c
+    }
+
+    pub fn hue(&self) -> f64 {
+        self.to_lch().h
+    }
+
+    pub fn hue_radians(&self) -> f64 {
+        self.to_lch().h.to_radians()
+    }
+
+    pub fn to_xyz(&self) -> XyzValue {
+        lab_to_xyz(self)
+    }
+
     pub fn round_to(&self, places: i32) -> LabValue {
         //! Round `LabValue` to nearest decimal places.
         Self {
@@ -175,6 +191,44 @@ impl fmt::Display for LchValue {
     }
 }
 
+#[derive(Debug, PartialEq, Clone)]
+pub struct XyzValue {
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
+}
+
+impl XyzValue {
+    pub fn new(x: f64, y: f64, z:f64) -> ValueResult<Self> {
+        //! New `XyzValue` from 3 `f64`s
+        let xyz = Self { x, y, z};
+        validate_xyz(xyz)
+    }
+
+    pub fn from(xyz_string: &str) -> ValueResult<Self> {
+        //! New `XyzValue` from `&str`
+        let split = parse_str_to_vecf64(xyz_string, 3)?;
+
+        let xyz = Self {
+            x: split[0],
+            y: split[1],
+            z: split[2],
+        };
+
+        validate_xyz(xyz)
+    }
+
+    pub fn to_lab(&self) -> LabValue {
+        xyz_to_lab([self.x, self.y, self.z])
+    }
+}
+
+impl fmt::Display for XyzValue {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "[X:{}, Y:{}, Z:{}]", self.x, self.y, self.z)
+    }
+}
+
 #[derive(Debug)]
 pub enum ValueError {
     OutOfBounds,
@@ -242,5 +296,69 @@ fn validate_lch(lch: LchValue) -> ValueResult<LchValue> {
         Err(ValueError::OutOfBounds)
     } else {
         Ok(lch)
+    }
+}
+
+fn validate_xyz(xyz: XyzValue) -> ValueResult<XyzValue> {
+    // Check that the XYZ values are in the proper range or Error
+    if xyz.x < 0.0 || xyz.x > 1.0 ||
+       xyz.y < 0.0 || xyz.y > 1.0 ||
+       xyz.z < 0.0 || xyz.z > 1.0
+    {
+        Err(ValueError::OutOfBounds)
+    } else {
+        Ok(xyz)
+    }
+}
+
+const KAPPA: f64 = 24389.0 / 27.0;
+const EPSILON: f64 = 216.0 / 24389.0;
+const CBRT_EPSILON: f64 = 0.20689655172413796;
+
+fn lab_to_xyz(lab: &LabValue) -> XyzValue {
+    let fy = (lab.l + 16.0) / 116.0;
+    let fx = (lab.a / 500.0) + fy;
+    let fz = fy - (lab.b / 200.0);
+    let xr = if fx > CBRT_EPSILON {
+        fx.powi(3)
+    } else {
+        ((fx * 116.0) - 16.0) / KAPPA
+    };
+    let yr = if lab.l > EPSILON * KAPPA {
+        fy.powi(3)
+    } else {
+        lab.l / KAPPA
+    };
+    let zr = if fz > CBRT_EPSILON {
+        fz.powi(3)
+    } else {
+        ((fz * 116.0) - 16.0) / KAPPA
+    };
+
+    XyzValue {
+        x: xr * 0.95047,
+        y: yr,
+        z: zr * 1.08883,
+    }
+}
+
+#[inline]
+fn xyz_to_lab_map(c: f64) -> f64 {
+    if c > EPSILON {
+        c.powf(1.0/3.0)
+    } else {
+        (KAPPA * c + 16.0) / 116.0
+    }
+}
+
+fn xyz_to_lab(xyz: [f64; 3]) -> LabValue {
+    let x = xyz_to_lab_map(xyz[0] / 0.95047);
+    let y = xyz_to_lab_map(xyz[1]);
+    let z = xyz_to_lab_map(xyz[2] / 1.08883);
+
+    LabValue {
+        l: (116.0 * y) - 16.0,
+        a: 500.0 * (x - y),
+        b: 200.0 * (y - z),
     }
 }

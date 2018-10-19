@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["ValueError",""]],"struct":[["LabValue",""],["LchValue",""]]});
+initSidebarItems({"enum":[["ValueError",""]],"struct":[["LabValue",""],["LchValue",""],["XyzValue",""]]});

@@ -2,7 +2,7 @@
 extern crate clap;
 extern crate deltae;
 
-use deltae::*;
+use deltae::DeltaE;
 
 fn main() {
     //Parse command line arguments with clap

@@ -1,5 +1,5 @@
 use super::*;
-use color::{LabValue, LchValue};
+use color::{LabValue, LchValue, XyzValue};
 
 #[test]
 fn round() {
@@ -32,6 +32,19 @@ fn lch_to_lab() {
     let lab  = lch.to_lab();
     let lch2 = lab.to_lch();
     assert_eq!(lch.round_to(4), lch2.round_to(4));
+}
+
+#[test]
+fn lab_to_xyz() {
+    let lab = LabValue {
+        l: 30.0,
+        a: 40.0,
+        b: 50.0,
+    };
+
+    let xyz  = lab.to_xyz();
+    let lab2 = xyz.to_lab();
+    assert_eq!(lab.round_to(4), lab2.round_to(4));
 }
 
 #[test]
@@ -105,9 +118,37 @@ fn lch_string() {
     }
 }
 
+#[test]
+fn xyz_string() {
+    let good = &[
+        "0, 0, 0",
+        "1, 1, 1",
+        "0.5, 0.5, 0.5"
+    ];
+
+    for i in good {
+        let b = XyzValue::from(i).is_ok();
+        assert_eq!(b, true);
+    }
+
+    let bad = &[
+        "-0.01, 0, 0",
+        "0, 1.01, 0",
+        "0, 0, 1.01",
+        "derp",
+        "0, 0, 0, derp",
+        "0, 0, derp"
+    ];
+
+    for i in bad {
+        let b = XyzValue::from(i).is_err();
+        assert_eq!(b, true);
+    }
+}
+
 fn compare_de(method: DEMethod, expected: f64, reference: &[f64; 3], sample: &[f64; 3]) {
-    let lab0 = LabValue::new(reference[0], reference[1], reference[2]).unwrap();
-    let lab1 = LabValue::new(sample[0],    sample[1],    sample[2])   .unwrap();
+    let lab0 = LabValue::new(reference[0], reference[1], reference[2]).unwrap().to_lch().to_lab();
+    let lab1 = LabValue::new(sample[0],    sample[1],    sample[2])   .unwrap().to_lch().to_lab();
 
     let de = DeltaE::new(&lab0, &lab1, method).round_to(4).value;
 

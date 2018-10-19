@@ -44,7 +44,7 @@ pub mod color;
 use color::*;
 
 #[cfg(test)]
-pub mod tests;
+mod tests;
 
 use std::error::Error;
 
