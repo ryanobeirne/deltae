@@ -221,6 +221,14 @@ impl XyzValue {
     pub fn to_lab(&self) -> LabValue {
         xyz_to_lab([self.x, self.y, self.z])
     }
+
+    pub fn round_to(&self, places: i32) -> Self {
+        Self {
+            x: round_to(self.x, places),
+            y: round_to(self.y, places),
+            z: round_to(self.z, places),
+        }
+    }
 }
 
 impl fmt::Display for XyzValue {
