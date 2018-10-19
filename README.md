@@ -66,7 +66,7 @@ deltae [--method=<DE Method>] <L,a,b,> <L,a,b>
 ### Example
 
 ```sh
-deltae --method=de1976 89.73,1.88,-6.96 95.08,-0.17,-10.81
+deltae --method=de1976 "89.73, 1.88, -6.96" "95.08, -0.17, -10.81"
 ```
 
 ### Install
