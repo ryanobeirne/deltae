@@ -64,6 +64,8 @@ impl DeltaE {
             DEMethod::DE1994  => delta_e_1994(lab_0, lab_1, false),
             DEMethod::DE1994T => delta_e_1994(lab_0, lab_1, true),
             DEMethod::DE1976  => delta_e_1976(lab_0, lab_1),
+            DEMethod::DECMC1  => delta_e_cmc(lab_0, lab_1, 1.0, 1.0),
+            DEMethod::DECMC2  => delta_e_cmc(lab_0, lab_1, 2.0, 1.0),
         };
 
         let color0 = lab_0.to_owned();
@@ -72,14 +74,14 @@ impl DeltaE {
         DeltaE { method, value, color0, color1 }
     }
 
-    pub fn round_to(self, places: i32) -> Self {
+    pub fn round_to(&self, places: i32) -> Self {
         //! Round `DeltaE` value and its components to nearest decimal places
-        DeltaE {
-            method: self.method,
+        Self {
+            method: self.method.clone(),
             value: round_to(self.value, places),
             color0: self.color0.round_to(places),
-            color1: self.color1.round_to(places),
-        }
+            color1: self.color1.round_to(places)
+        }.clone()
     }
 
     pub fn from(color_0: &str, color_1: &str, method: &str) -> Result<DeltaE, Box<Error>> {
@@ -111,8 +113,8 @@ pub enum DEMethod{
     DE1994,
     DE1994T,
     DE1976,
-    // DECMC1,
-    // DECMC2,
+    DECMC1,
+    DECMC2,
 }
 
 impl DEMethod {
@@ -124,8 +126,8 @@ impl DEMethod {
             "de1994"  | "de94"  | "1994"  | "94" |
             "de1994g" | "de94g" | "1994g" | "94g" => DEMethod::DE1994,
             "de1994t" | "de94t" | "1994t" | "94t" => DEMethod::DE1994T,
-            // "decmc1" | "cmc1" | "cmc"         => DEMethod::DECMC1,
-            // "decmc2" | "cmc2"                 => DEMethod::DECMC1,
+            "decmc"   | "decmc1"| "cmc1"  | "cmc" => DEMethod::DECMC1,
+            "decmc2"  | "cmc2"                    => DEMethod::DECMC2,
             _ => {
                 eprintln!("Invalid Method: '{}'. Using DE2000", string);
                 DEMethod::DE2000 
@@ -256,10 +258,48 @@ fn delta_e_2000(lab_0: &LabValue, lab_1: &LabValue) -> f64 {
     de2000
 }
 
-//fn delta_e_CMC1(c1: &LabValue, c2:&LabValue) -> f64 {
-    //math
-//}
+fn delta_e_cmc(lab0: &LabValue, lab1 :&LabValue, tolerance_l: f64, tolerance_c: f64) -> f64 {
+    let chroma_0 = (lab0.a.powi(2) + lab0.b.powi(2)).sqrt();
+    let chroma_1 = (lab1.a.powi(2) + lab1.b.powi(2)).sqrt();
+    let delta_c = chroma_0 - chroma_1;
 
-//fn delta_e_CMC2(c1: &LabValue, c2:&LabValue) -> f64 {
-    //math
-//}
+    let delta_l = lab0.l - lab1.l;
+    let delta_a = lab0.a - lab1.a;
+    let delta_b = lab0.b - lab1.b;
+
+    let delta_h = (delta_a.powi(2) + delta_b.powi(2) - delta_c.powi(2)).sqrt();
+
+    let s_l = if lab0.l < 16.0 {
+        0.511
+    } else {
+        (0.040975 * lab0.l) / (1.0 + (0.01765 * lab0.l))
+    };
+
+    let s_c = ((0.0638 * chroma_0) / (1.0 + (0.0131 * chroma_0))) + 0.638;
+
+    let h = lab0.b.atan2(lab0.a).to_degrees();
+
+    let h_1 = if h >= 0.0 {
+        h
+    } else {
+        h + 360.0
+    };
+
+    let f = (chroma_0.powi(4) / (chroma_0.powi(4) + 1900.0)).sqrt();
+
+    let t = if 164.0 <= h_1 && h_1 <= 345.0 {
+        0.56 + (0.2 * (h_1 + 168.0).to_radians().cos()).abs()
+    } else {
+        0.36 + (0.4 * (h_1 + 35.0).to_radians().cos()).abs()
+    };
+
+    let s_h = s_c * (f * t + 1.0 - f);
+
+    let decmc = (
+        (delta_l / (tolerance_l * s_l)).powi(2) +
+        (delta_c / (tolerance_c * s_c)).powi(2) +
+        (delta_h / s_h).powi(2)
+    ).sqrt();
+
+    decmc
+}

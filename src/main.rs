@@ -21,8 +21,8 @@ fn main() {
 
     let delta_e = DeltaE::from(color0, color1, method);
 
-    match delta_e {
-        Ok(de) => println!("{}", de.round_to(4).value),
+    match &delta_e {
+        Ok(de) => println!("{}: {}", de.method, de.round_to(4)),
         Err(e) => {
             eprintln!("ERROR: {}", e);
             std::process::exit(1);

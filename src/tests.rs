@@ -6,6 +6,7 @@ fn round() {
     let val = 1.234567890;
     let rnd = round_to(val, 4);
     assert_eq!(rnd, 1.2346);
+    assert_ne!(rnd, val);
 }
 
 #[test]
@@ -153,6 +154,16 @@ fn compare_de(method: DEMethod, expected: f64, reference: &[f64; 3], sample: &[f
     let de = DeltaE::new(&lab0, &lab1, method).round_to(4).value;
 
     assert_eq!(expected, de);
+}
+
+#[test]
+fn decmc1() {
+    compare_de(DEMethod::DECMC1, 17.4901, &[20.0, 30.0, 40.0], &[30.0, 40.0, 50.0]);
+}
+
+#[test]
+fn decmc2() {
+    compare_de(DEMethod::DECMC2, 10.0731, &[20.0, 30.0, 40.0], &[30.0, 40.0, 50.0])
 }
 
 #[test]
