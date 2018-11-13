@@ -71,18 +71,13 @@ deltae --method=de1976 "89.73, 1.88, -6.96" "95.08, -0.17, -10.81"
 
 ### Install
 
-#### Requires rustc and cargo to build
-
 ```sh
 git clone https://github.com/robeirne/deltae
 cd deltae
+cargo build --release
 cargo install
 ```
 
 ### Notes
 
-Calculates DE2000, DE1994 (Graphic Arts only), and DE1976. The Default is DE2000.
-
-### TODO
-
-- Add DE1994 (textiles), DECMC1, DECMC2 DEMethods
+Calculates DE2000, DE1994 (Graphic Arts and Textiles), DECMC(1:1), DECMC(2:1), and DE1976. The Default is DE2000.
