@@ -107,7 +107,7 @@ fn round_to(val: f64, places: i32) -> f64 {
     (val * mult).round() / mult
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum DEMethod{
     DE2000,
     DE1994,
