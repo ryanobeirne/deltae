@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["DEMethod",""]],"mod":[["color","Manipulate and convert CIE L*a*b* and Lch colors."]],"struct":[["DeltaE",""]]});
+initSidebarItems({"enum":[["DEMethod",""]],"mod":[["color","Manipulate and convert CIE L*a*b* and Lch colors."]],"struct":[["DeltaE",""]],"trait":[["FromStr","Parse a value from a string"]]});

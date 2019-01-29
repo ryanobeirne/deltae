@@ -61,7 +61,7 @@ fn lab_string() {
     ];
 
     for i in good {
-        let b = LabValue::from(i).is_ok();
+        let b = LabValue::from_str(i).is_ok();
         assert_eq!(b, true);
     }
 
@@ -79,7 +79,7 @@ fn lab_string() {
     ];
 
     for i in bad {
-        let b = LabValue::from(i).is_err();
+        let b = LabValue::from_str(i).is_err();
         assert_eq!(b, true);
     }
 }
@@ -95,7 +95,7 @@ fn lch_string() {
     ];
 
     for i in good {
-        let b = LchValue::from(i).is_ok();
+        let b = LchValue::from_str(i).is_ok();
         assert_eq!(b, true);
     }
 
@@ -114,7 +114,7 @@ fn lch_string() {
     ];
 
     for i in bad {
-        let b = LchValue::from(i).is_err();
+        let b = LchValue::from_str(i).is_err();
         assert_eq!(b, true);
     }
 }
@@ -128,7 +128,7 @@ fn xyz_string() {
     ];
 
     for i in good {
-        let b = XyzValue::from(i).is_ok();
+        let b = XyzValue::from_str(i).is_ok();
         assert_eq!(b, true);
     }
 
@@ -142,7 +142,7 @@ fn xyz_string() {
     ];
 
     for i in bad {
-        let b = XyzValue::from(i).is_err();
+        let b = XyzValue::from_str(i).is_err();
         assert_eq!(b, true);
     }
 }

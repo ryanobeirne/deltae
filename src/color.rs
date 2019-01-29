@@ -17,9 +17,10 @@
 //! ```
 //! extern crate deltae;
 //! use deltae::color::{LabValue, LchValue};
+//! use std::str::FromStr;
 //! 
 //! fn main() {
-//!     let lab0 = LabValue::from("95.08, -0.17, -10.81").unwrap();
+//!     let lab0 = LabValue::from_str("95.08, -0.17, -10.81").unwrap();
 //!     let lab1 = LabValue {
 //!         l: 95.08,
 //!         a: -0.17,
@@ -40,6 +41,7 @@
 use super::*;
 use std::fmt;
 use std::error::Error;
+use std::str::FromStr;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct LabValue {
@@ -49,29 +51,23 @@ pub struct LabValue {
 }
 
 impl LabValue {
-    pub fn new(l: f64, a: f64, b: f64) -> ValueResult<Self> {
+    pub fn new(l: f64, a: f64, b: f64) -> ValueResult<LabValue> {
         //! New `LabValue` from 3 `f64`s
-        let lab = Self{l, a, b};
-        validate_lab(lab)
+        LabValue {l, a, b}.validate()
     }
 
-    pub fn zero() -> Self {
-        //! New `LabValue` with a value of 0,0,0.
-        Self { l: 0.0, a: 0.0, b: 0.0 }
+    fn validate(self) -> ValueResult<LabValue> {
+        // Check that the Lab values are in the proper range or Error
+        if  self.l < 0.0    || self.l > 100.0 ||
+            self.a < -128.0 || self.a > 128.0 ||
+            self.b < -128.0 || self.b > 128.0
+        {
+            Err(ValueError::OutOfBounds)
+        } else {
+            Ok(self)
+        }
     }
 
-    pub fn from(lab_string: &str) -> ValueResult<Self> {
-        //! New `LabValue` from `&str`
-        let split = parse_str_to_vecf64(lab_string, 3)?;
-
-        let lab = Self {
-            l: split[0],
-            a: split[1],
-            b: split[2],
-        };
-
-        validate_lab(lab)
-    }
 
     pub fn to_lch(&self) -> LchValue {
         //! Convert `LabValue` to `LchValue`
@@ -100,7 +96,7 @@ impl LabValue {
 
     pub fn round_to(&self, places: i32) -> LabValue {
         //! Round `LabValue` to nearest decimal places.
-        Self {
+        LabValue {
             l: round_to(self.l, places),
             a: round_to(self.a, places),
             b: round_to(self.b, places),
@@ -118,6 +114,27 @@ impl LabValue {
     }
 }
 
+impl Default for LabValue {
+    fn default() -> LabValue {
+        LabValue { l: 0.0, a: 0.0, b: 0.0 }
+    }
+}
+
+impl FromStr for LabValue {
+    type Err = ValueError;
+
+    fn from_str(s: &str) -> ValueResult<LabValue> {
+        //! New `LabValue` from `&str`
+        let split = parse_str_to_vecf64(s, 3)?;
+
+        LabValue {
+            l: split[0],
+            a: split[1],
+            b: split[2],
+        }.validate()
+    }
+}
+
 impl fmt::Display for LabValue {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "[L:{}, a:{}, b:{}]", self.l, self.a, self.b)
@@ -132,28 +149,21 @@ pub struct LchValue {
 }
 
 impl LchValue {
-    pub fn new(l: f64, c: f64, h: f64) -> ValueResult<Self> {
+    pub fn new(l: f64, c: f64, h: f64) -> ValueResult<LchValue> {
         //! New `LchValue` from 3 `f64`s
-        let lch = Self {l, c, h};
-        validate_lch(lch)
+        LchValue {l, c, h}.validate()
     }
 
-    pub fn zero() -> Self {
-        //! New `LchValue` with a value of 0,0,0
-        Self { l: 0.0, c: 0.0, h: 0.0 }
-    }
-
-    pub fn from(lch_string: &str) -> ValueResult<Self> {
-        //! New `LchValue` from `&str`
-        let split = parse_str_to_vecf64(lch_string, 3)?;
-
-        let lch = Self {
-            l: split[0],
-            c: split[1],
-            h: split[2],
-        };
-
-        validate_lch(lch)
+    fn validate(self) -> ValueResult<LchValue> {
+        // Check that the Lab values are in the proper range or Error
+        if  self.l < 0.0 || self.l > 100.0 ||
+            self.c < 0.0 || self.c > (128_f64.powi(2) + 128_f64.powi(2)).sqrt() ||
+            self.h < 0.0 || self.h > 360.0
+        {
+            Err(ValueError::OutOfBounds)
+        } else {
+            Ok(self)
+        }
     }
 
     pub fn to_lab(&self) -> LabValue {
@@ -165,9 +175,9 @@ impl LchValue {
         }
     }
 
-    pub fn round_to(&self, places: i32) -> Self {
+    pub fn round_to(&self, places: i32) -> LchValue {
         //! Round `LchValue` to nearest decimal places.
-        Self {
+        LchValue {
             l: round_to(self.l, places),
             c: round_to(self.c, places),
             h: round_to(self.h, places),
@@ -185,6 +195,27 @@ impl LchValue {
     }
 }
 
+impl Default for LchValue {
+    fn default() -> LchValue {
+        LchValue { l: 0.0, c: 0.0, h: 0.0 }
+    }
+}
+
+impl FromStr for LchValue {
+    type Err = ValueError;
+
+    fn from_str(s: &str) -> ValueResult<LchValue> {
+        //! New `LchValue` from `&str`
+        let split = parse_str_to_vecf64(s, 3)?;
+
+        LchValue {
+            l: split[0],
+            c: split[1],
+            h: split[2],
+        }.validate()
+    }
+}
+
 impl fmt::Display for LchValue {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "[L:{}, c:{}, h:{}]", self.l, self.c, self.h)
@@ -199,36 +230,57 @@ pub struct XyzValue {
 }
 
 impl XyzValue {
-    pub fn new(x: f64, y: f64, z:f64) -> ValueResult<Self> {
+    pub fn new(x: f64, y: f64, z:f64) -> ValueResult<XyzValue> {
         //! New `XyzValue` from 3 `f64`s
-        let xyz = Self { x, y, z};
-        validate_xyz(xyz)
-    }
-
-    pub fn from(xyz_string: &str) -> ValueResult<Self> {
-        //! New `XyzValue` from `&str`
-        let split = parse_str_to_vecf64(xyz_string, 3)?;
-
-        let xyz = Self {
-            x: split[0],
-            y: split[1],
-            z: split[2],
-        };
-
-        validate_xyz(xyz)
+        XyzValue { x, y, z}.validate()
     }
 
     pub fn to_lab(&self) -> LabValue {
         xyz_to_lab([self.x, self.y, self.z])
     }
 
-    pub fn round_to(&self, places: i32) -> Self {
-        Self {
+    pub fn round_to(&self, places: i32) -> XyzValue {
+        XyzValue {
             x: round_to(self.x, places),
             y: round_to(self.y, places),
             z: round_to(self.z, places),
         }
     }
+
+    fn validate(self) -> ValueResult<XyzValue> {
+        // Check that the XYZ values are in the proper range or Error
+        if self.x < 0.0 || self.x > 1.0 ||
+        self.y < 0.0 || self.y > 1.0 ||
+        self.z < 0.0 || self.z > 1.0
+        {
+            Err(ValueError::OutOfBounds)
+        } else {
+            Ok(self)
+    }
+}
+
+}
+
+impl Default for XyzValue {
+    fn default() -> XyzValue {
+        XyzValue { x: 0.0, y: 0.0, z: 0.0 }
+    }
+}
+
+impl FromStr for XyzValue {
+    type Err = ValueError;
+
+    fn from_str(s: &str) -> ValueResult<XyzValue> {
+        //! New `XyzValue` from `&str`
+        let split = parse_str_to_vecf64(s, 3)?;
+
+        XyzValue {
+            x: split[0],
+            y: split[1],
+            z: split[2],
+        }.validate()
+    }
+
 }
 
 impl fmt::Display for XyzValue {
@@ -243,7 +295,7 @@ pub enum ValueError {
     BadFormat,
 }
 
-type ValueResult<T> = Result<T, ValueError>;
+pub type ValueResult<T> = Result<T, ValueError>;
 
 impl fmt::Display for ValueError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -260,7 +312,7 @@ impl Error for ValueError {
     }
 }
 
-fn parse_str_to_vecf64(s: &str, length: usize) -> Result<Vec<f64>, ValueError> {
+fn parse_str_to_vecf64(s: &str, length: usize) -> ValueResult<Vec<f64>> {
     // Validate and convert strings to `LabValue`.
     // Split string by comma (92.5,33.5,-18.8).
     let collection: Vec<&str> = s.split(",").collect();
@@ -281,42 +333,6 @@ fn parse_str_to_vecf64(s: &str, length: usize) -> Result<Vec<f64>, ValueError> {
     }
 
     Ok(split)
-}
-
-fn validate_lab(lab: LabValue) -> ValueResult<LabValue> {
-    // Check that the Lab values are in the proper range or Error
-    if  lab.l < 0.0    || lab.l > 100.0 ||
-        lab.a < -128.0 || lab.a > 128.0 ||
-        lab.b < -128.0 || lab.b > 128.0
-    {
-        Err(ValueError::OutOfBounds)
-    } else {
-        Ok(lab)
-    }
-}
-
-fn validate_lch(lch: LchValue) -> ValueResult<LchValue> {
-    // Check that the Lab values are in the proper range or Error
-    if  lch.l < 0.0 || lch.l > 100.0 ||
-        lch.c < 0.0 || lch.c > (128_f64.powi(2) + 128_f64.powi(2)).sqrt() ||
-        lch.h < 0.0 || lch.h > 360.0
-    {
-        Err(ValueError::OutOfBounds)
-    } else {
-        Ok(lch)
-    }
-}
-
-fn validate_xyz(xyz: XyzValue) -> ValueResult<XyzValue> {
-    // Check that the XYZ values are in the proper range or Error
-    if xyz.x < 0.0 || xyz.x > 1.0 ||
-       xyz.y < 0.0 || xyz.y > 1.0 ||
-       xyz.z < 0.0 || xyz.z > 1.0
-    {
-        Err(ValueError::OutOfBounds)
-    } else {
-        Ok(xyz)
-    }
 }
 
 const KAPPA: f64 = 24389.0 / 27.0;

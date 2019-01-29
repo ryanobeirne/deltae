@@ -6,9 +6,10 @@
 //! extern crate deltae;
 //! use deltae::{DeltaE, DEMethod::DE2000};
 //! use deltae::color::LabValue;
+//! use std::str::FromStr;
 //!
 //! fn main() {
-//!     let lab0 = LabValue::from("89.73, 1.88, -6.96").unwrap();
+//!     let lab0 = LabValue::from_str("89.73, 1.88, -6.96").unwrap();
 //!     let lab1 = LabValue {
 //!         l: 95.08,
 //!         a: -0.17,
@@ -39,14 +40,13 @@
 //! ```
 
 use std::fmt;
+pub use std::str::FromStr;
 
 pub mod color;
 use color::*;
 
 #[cfg(test)]
 mod tests;
-
-use std::error::Error;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct DeltaE {
@@ -84,11 +84,11 @@ impl DeltaE {
         }.clone()
     }
 
-    pub fn from(color_0: &str, color_1: &str, method: &str) -> Result<DeltaE, Box<Error>> {
+    pub fn from(color_0: &str, color_1: &str, method: &str) -> ValueResult<DeltaE> {
         //! Parse `DeltaE` from `&str`'s
-        let lab_0 = LabValue::from(color_0)?;
-        let lab_1 = LabValue::from(color_1)?;
-        let meth = DEMethod::from(method);
+        let lab_0 = LabValue::from_str(color_0)?;
+        let lab_1 = LabValue::from_str(color_1)?;
+        let meth = DEMethod::from_str(method).unwrap();
 
         let de = DeltaE::new(&lab_0, &lab_1, meth);
 
@@ -117,20 +117,27 @@ pub enum DEMethod{
     DECMC2,
 }
 
-impl DEMethod {
-    pub fn from(string: &str) -> Self {
-        //! Parse `DEMethod` from `&str`.
-        match string.to_lowercase().as_ref() {
-            "de2000"  | "de00"  | "2000"  | "00"  => DEMethod::DE2000,
-            "de1976"  | "de76"  | "1976"  | "76"  => DEMethod::DE1976,
+impl Default for DEMethod {
+    fn default() -> DEMethod {
+        DEMethod::DE2000
+    }
+}
+
+impl FromStr for DEMethod {
+    type Err = std::io::Error;
+    fn from_str(s: &str) -> Result<DEMethod, Self::Err> {
+        //! Parse `DEMethod` from `&str`. Always returns `Ok()`. DE2000 is default.
+        match s.to_lowercase().as_ref() {
+            "de2000"  | "de00"  | "2000"  | "00"  => Ok(DEMethod::DE2000),
+            "de1976"  | "de76"  | "1976"  | "76"  => Ok(DEMethod::DE1976),
             "de1994"  | "de94"  | "1994"  | "94" |
-            "de1994g" | "de94g" | "1994g" | "94g" => DEMethod::DE1994,
-            "de1994t" | "de94t" | "1994t" | "94t" => DEMethod::DE1994T,
-            "decmc"   | "decmc1"| "cmc1"  | "cmc" => DEMethod::DECMC1,
-            "decmc2"  | "cmc2"                    => DEMethod::DECMC2,
+            "de1994g" | "de94g" | "1994g" | "94g" => Ok(DEMethod::DE1994),
+            "de1994t" | "de94t" | "1994t" | "94t" => Ok(DEMethod::DE1994T),
+            "decmc"   | "decmc1"| "cmc1"  | "cmc" => Ok(DEMethod::DECMC1),
+            "decmc2"  | "cmc2"                    => Ok(DEMethod::DECMC2),
             _ => {
-                eprintln!("Invalid Method: '{}'. Using DE2000", string);
-                DEMethod::DE2000 
+                eprintln!("Invalid Method: '{}'. Using default: {}", s, DEMethod::default());
+                Ok(DEMethod::default())
             }
         }
     }
