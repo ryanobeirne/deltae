@@ -1,9 +1,13 @@
 [package]
 name = "deltae"
-version = "0.1.1"
-authors = ["Ryan O'Beirne <robeirne@spoonflower.com>"]
+version = "0.1.2"
+authors = ["Ryan O'Beirne <ryanobeirne@gmail.com>"]
 description = "Calculate Delta E between two colors in CIE Lab space."
 edition = "2018"
+license = "LGPL-3.0"
+documentation = "https://ryanobeirne.github.io/deltae"
+homepage = "https://github.com/ryanobeirne/deltae"
+repository = "https://github.com/ryanobeirne/deltae.git"
 
-[dependencies]
+[dev-dependencies]
 clap = "2.32.0"
