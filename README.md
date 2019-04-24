@@ -5,7 +5,7 @@
 A rust library for interacting with and manipulating Lab and Lch colors and calculating DeltaE (color difference).
 
 Check out the documentation here:
-[Rust API Documentation](https://robeirne.github.io/deltae)
+[Rust API Documentation](https://ryanobeirne.github.io/deltae)
 
 ...or compile it yourself:
 
@@ -72,9 +72,9 @@ deltae --method=de1976 "89.73, 1.88, -6.96" "95.08, -0.17, -10.81"
 ### Install
 
 ```sh
-git clone https://github.com/robeirne/deltae
+git clone https://github.com/ryanobeirne/deltae
 cd deltae
-cargo install --path=.
+cargo install --example=deltae --path=. --force
 ```
 
 ### Notes
