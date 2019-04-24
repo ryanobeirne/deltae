@@ -74,8 +74,7 @@ deltae --method=de1976 "89.73, 1.88, -6.96" "95.08, -0.17, -10.81"
 ```sh
 git clone https://github.com/robeirne/deltae
 cd deltae
-cargo build --release
-cargo install
+cargo install --path=.
 ```
 
 ### Notes

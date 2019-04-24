@@ -8,6 +8,7 @@ license = "LGPL-3.0"
 documentation = "https://ryanobeirne.github.io/deltae"
 homepage = "https://github.com/ryanobeirne/deltae"
 repository = "https://github.com/ryanobeirne/deltae.git"
+readme = "README.md"
 
 [dev-dependencies]
 clap = "2.32.0"
