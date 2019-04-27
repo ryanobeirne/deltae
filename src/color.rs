@@ -45,14 +45,14 @@ use std::str::FromStr;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct LabValue {
-    pub l: f64,
-    pub a: f64,
-    pub b: f64,
+    pub l: f32,
+    pub a: f32,
+    pub b: f32,
 }
 
 impl LabValue {
-    pub fn new(l: f64, a: f64, b: f64) -> ValueResult<LabValue> {
-        //! New `LabValue` from 3 `f64`s
+    pub fn new(l: f32, a: f32, b: f32) -> ValueResult<LabValue> {
+        //! New `LabValue` from 3 `f32`s
         LabValue {l, a, b}.validate()
     }
 
@@ -78,15 +78,15 @@ impl LabValue {
         }
     }
 
-    pub fn chroma(&self) -> f64 {
+    pub fn chroma(&self) -> f32 {
         self.to_lch().c
     }
 
-    pub fn hue(&self) -> f64 {
+    pub fn hue(&self) -> f32 {
         self.to_lch().h
     }
 
-    pub fn hue_radians(&self) -> f64 {
+    pub fn hue_radians(&self) -> f32 {
         self.to_lch().h.to_radians()
     }
 
@@ -103,13 +103,13 @@ impl LabValue {
         }       
     }
 
-    pub fn to_a(&self) -> [f64; 3] {
+    pub fn to_a(&self) -> [f32; 3] {
         //! Returns an array of [L, a, b]
         [self.l, self.a, self.b]
     }
 
-    pub fn to_vec(&self) -> Vec<f64> {
-        //! Returns a `Vec<f64>` of [L, a, b]
+    pub fn to_vec(&self) -> Vec<f32> {
+        //! Returns a `Vec<f32>` of [L, a, b]
         vec![self.l, self.a, self.b]
     }
 }
@@ -125,7 +125,7 @@ impl FromStr for LabValue {
 
     fn from_str(s: &str) -> ValueResult<LabValue> {
         //! New `LabValue` from `&str`
-        let split = parse_str_to_vecf64(s, 3)?;
+        let split = parse_str_to_vecf32(s, 3)?;
 
         LabValue {
             l: split[0],
@@ -143,21 +143,21 @@ impl fmt::Display for LabValue {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct LchValue {
-    pub l: f64,
-    pub c: f64,
-    pub h: f64,
+    pub l: f32,
+    pub c: f32,
+    pub h: f32,
 }
 
 impl LchValue {
-    pub fn new(l: f64, c: f64, h: f64) -> ValueResult<LchValue> {
-        //! New `LchValue` from 3 `f64`s
+    pub fn new(l: f32, c: f32, h: f32) -> ValueResult<LchValue> {
+        //! New `LchValue` from 3 `f32`s
         LchValue {l, c, h}.validate()
     }
 
     fn validate(self) -> ValueResult<LchValue> {
         // Check that the Lab values are in the proper range or Error
         if  self.l < 0.0 || self.l > 100.0 ||
-            self.c < 0.0 || self.c > (128_f64.powi(2) + 128_f64.powi(2)).sqrt() ||
+            self.c < 0.0 || self.c > (128_f32.powi(2) + 128_f32.powi(2)).sqrt() ||
             self.h < 0.0 || self.h > 360.0
         {
             Err(ValueError::OutOfBounds)
@@ -184,13 +184,13 @@ impl LchValue {
         }       
     }
 
-    pub fn to_a(&self) -> [f64; 3] {
+    pub fn to_a(&self) -> [f32; 3] {
         //! Returns an array of [L, c, h]
         [self.l, self.c, self.h]
     }
 
-    pub fn to_vec(&self) -> Vec<f64> {
-        //! Returns a `Vec<f64>` of [L, c, h]
+    pub fn to_vec(&self) -> Vec<f32> {
+        //! Returns a `Vec<f32>` of [L, c, h]
         vec![self.l, self.c, self.h]
     }
 }
@@ -206,7 +206,7 @@ impl FromStr for LchValue {
 
     fn from_str(s: &str) -> ValueResult<LchValue> {
         //! New `LchValue` from `&str`
-        let split = parse_str_to_vecf64(s, 3)?;
+        let split = parse_str_to_vecf32(s, 3)?;
 
         LchValue {
             l: split[0],
@@ -224,14 +224,14 @@ impl fmt::Display for LchValue {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct XyzValue {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64,
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
 }
 
 impl XyzValue {
-    pub fn new(x: f64, y: f64, z:f64) -> ValueResult<XyzValue> {
-        //! New `XyzValue` from 3 `f64`s
+    pub fn new(x: f32, y: f32, z:f32) -> ValueResult<XyzValue> {
+        //! New `XyzValue` from 3 `f32`s
         XyzValue { x, y, z}.validate()
     }
 
@@ -272,7 +272,7 @@ impl FromStr for XyzValue {
 
     fn from_str(s: &str) -> ValueResult<XyzValue> {
         //! New `XyzValue` from `&str`
-        let split = parse_str_to_vecf64(s, 3)?;
+        let split = parse_str_to_vecf32(s, 3)?;
 
         XyzValue {
             x: split[0],
@@ -312,7 +312,7 @@ impl Error for ValueError {
     }
 }
 
-fn parse_str_to_vecf64(s: &str, length: usize) -> ValueResult<Vec<f64>> {
+fn parse_str_to_vecf32(s: &str, length: usize) -> ValueResult<Vec<f32>> {
     // Validate and convert strings to `LabValue`.
     // Split string by comma (92.5,33.5,-18.8).
     let collection: Vec<&str> = s.split(",").collect();
@@ -324,8 +324,8 @@ fn parse_str_to_vecf64(s: &str, length: usize) -> ValueResult<Vec<f64>> {
             v.push(item.trim());
         }
     }
-    // Parse the f64's into a Vec
-    let split: Vec<f64> = v.iter().filter_map(|s| s.parse().ok()).collect();
+    // Parse the f32's into a Vec
+    let split: Vec<f32> = v.iter().filter_map(|s| s.parse().ok()).collect();
 
     // Check if it's the right number of items
     if v.len() != length || split.len() != length {
@@ -335,9 +335,9 @@ fn parse_str_to_vecf64(s: &str, length: usize) -> ValueResult<Vec<f64>> {
     Ok(split)
 }
 
-const KAPPA: f64 = 24389.0 / 27.0;
-const EPSILON: f64 = 216.0 / 24389.0;
-const CBRT_EPSILON: f64 = 0.20689655172413796;
+const KAPPA: f32 = 24389.0 / 27.0;
+const EPSILON: f32 = 216.0 / 24389.0;
+const CBRT_EPSILON: f32 = 0.20689655172413796;
 
 fn lab_to_xyz(lab: &LabValue) -> XyzValue {
     let fy = (lab.l + 16.0) / 116.0;
@@ -367,7 +367,7 @@ fn lab_to_xyz(lab: &LabValue) -> XyzValue {
 }
 
 #[inline]
-fn xyz_to_lab_map(c: f64) -> f64 {
+fn xyz_to_lab_map(c: f32) -> f32 {
     if c > EPSILON {
         c.powf(1.0/3.0)
     } else {
@@ -375,7 +375,7 @@ fn xyz_to_lab_map(c: f64) -> f64 {
     }
 }
 
-fn xyz_to_lab(xyz: [f64; 3]) -> LabValue {
+fn xyz_to_lab(xyz: [f32; 3]) -> LabValue {
     let x = xyz_to_lab_map(xyz[0] / 0.95047);
     let y = xyz_to_lab_map(xyz[1]);
     let z = xyz_to_lab_map(xyz[2] / 1.08883);

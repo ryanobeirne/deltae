@@ -51,7 +51,7 @@ mod tests;
 #[derive(Debug, PartialEq, Clone)]
 pub struct DeltaE {
     pub method: DEMethod,
-    pub value: f64,
+    pub value: f32,
     pub color0: LabValue,
     pub color1: LabValue,
 }
@@ -102,8 +102,8 @@ impl fmt::Display for DeltaE {
     }
 }
 
-fn round_to(val: f64, places: i32) -> f64 {
-    let mult = 10_f64.powi(places);
+fn round_to(val: f32, places: i32) -> f32 {
+    let mult = 10_f32.powi(places);
     (val * mult).round() / mult
 }
 
@@ -149,12 +149,12 @@ impl fmt::Display for DEMethod {
     }
 }
 
-fn delta_e_1976(lab_0: &LabValue, lab_1: &LabValue) -> f64 {
+fn delta_e_1976(lab_0: &LabValue, lab_1: &LabValue) -> f32 {
     //! DeltaE 1976. Basic euclidian distance formula.
     ( (lab_0.l - lab_1.l).powi(2) + (lab_0.a - lab_1.a).powi(2) + (lab_0.b - lab_1.b).powi(2) ).sqrt()
 }
 
-fn delta_e_1994(lab_0: &LabValue, lab_1: &LabValue, textiles: bool) -> f64 {
+fn delta_e_1994(lab_0: &LabValue, lab_1: &LabValue, textiles: bool) -> f32 {
     let delta_l = lab_0.l - lab_1.l;
     let chroma_0 = (lab_0.a.powi(2) + lab_0.b.powi(2)).sqrt();
     let chroma_1 = (lab_1.a.powi(2) + lab_1.b.powi(2)).sqrt();
@@ -164,9 +164,9 @@ fn delta_e_1994(lab_0: &LabValue, lab_1: &LabValue, textiles: bool) -> f64 {
     let delta_hue = (delta_a.powi(2) + delta_b.powi(2) - delta_chroma.powi(2)).sqrt();
 
     struct K {
-        kl: f64,
-        k1: f64,
-        k2: f64,
+        kl: f32,
+        k1: f32,
+        k2: f32,
     }
 
     let k = if textiles {
@@ -185,7 +185,7 @@ fn delta_e_1994(lab_0: &LabValue, lab_1: &LabValue, textiles: bool) -> f64 {
     ).sqrt()
 }
 
-fn get_h_prime(a: f64, b: f64) -> f64 {
+fn get_h_prime(a: f32, b: f32) -> f32 {
     let mut h_prime = b.atan2(a).to_degrees();
     if h_prime < 0.0 {
         h_prime += 360.0;
@@ -193,14 +193,14 @@ fn get_h_prime(a: f64, b: f64) -> f64 {
     h_prime
 }
 
-fn delta_e_2000(lab_0: &LabValue, lab_1: &LabValue) -> f64 {
+fn delta_e_2000(lab_0: &LabValue, lab_1: &LabValue) -> f32 {
     //! DeltaE 2000. This is a ridiculously complicated formula.
     let chroma_0 = (lab_0.a.powi(2) + lab_0.b.powi(2)).sqrt();
     let chroma_1 = (lab_1.a.powi(2) + lab_1.b.powi(2)).sqrt();
 
     let c_bar = (chroma_0 + chroma_1) / 2.0;
 
-    let g = 0.5 * (1.0 - ( c_bar.powi(7) / (c_bar.powi(7) + 25_f64.powi(7)) ).sqrt());
+    let g = 0.5 * (1.0 - ( c_bar.powi(7) / (c_bar.powi(7) + 25_f32.powi(7)) ).sqrt());
 
     let a_prime_0 = lab_0.a * (1.0 + g);
     let a_prime_1 = lab_1.a * (1.0 + g);
@@ -248,7 +248,7 @@ fn delta_e_2000(lab_0: &LabValue, lab_1: &LabValue) -> f64 {
     let s_h = 1.0 + 0.015 * c_bar_prime * t;
     
     let delta_theta = 30.0 * (-((h_bar_prime - 275.0)/25.0).powi(2)).exp();
-    let r_c =  2.0 * (c_bar_prime.powi(7)/(c_bar_prime.powi(7) + 25_f64.powi(7))).sqrt();
+    let r_c =  2.0 * (c_bar_prime.powi(7)/(c_bar_prime.powi(7) + 25_f32.powi(7))).sqrt();
     let r_t = -(r_c * (2.0 * delta_theta.to_radians()).sin());
 
     let k_l = 1.0;
@@ -265,7 +265,7 @@ fn delta_e_2000(lab_0: &LabValue, lab_1: &LabValue) -> f64 {
     de2000
 }
 
-fn delta_e_cmc(lab0: &LabValue, lab1 :&LabValue, tolerance_l: f64, tolerance_c: f64) -> f64 {
+fn delta_e_cmc(lab0: &LabValue, lab1 :&LabValue, tolerance_l: f32, tolerance_c: f32) -> f32 {
     let chroma_0 = (lab0.a.powi(2) + lab0.b.powi(2)).sqrt();
     let chroma_1 = (lab1.a.powi(2) + lab1.b.powi(2)).sqrt();
     let delta_c = chroma_0 - chroma_1;
