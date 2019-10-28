@@ -1,6 +1,6 @@
 [package]
 name = "deltae"
-version = "0.1.5"
+version = "0.2.0"
 authors = ["Ryan O'Beirne <ryanobeirne@gmail.com>"]
 description = "Calculate Delta E between two colors in CIE Lab space."
 edition = "2018"
@@ -12,7 +12,7 @@ readme = "README.md"
 
 [[example]]
 name = "deltae"
-path = "examples/deltae.rs"
+path = "examples/deltae/deltae.rs"
 
 [dev-dependencies]
 clap = "2.32.0"

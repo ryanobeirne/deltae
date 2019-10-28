@@ -61,8 +61,7 @@ fn lab_string() {
     ];
 
     for i in good {
-        let b = LabValue::from_str(i).is_ok();
-        assert_eq!(b, true);
+        assert!(LabValue::from_str(i).is_ok());
     }
 
     let bad = &[
@@ -79,8 +78,7 @@ fn lab_string() {
     ];
 
     for i in bad {
-        let b = LabValue::from_str(i).is_err();
-        assert_eq!(b, true);
+        assert!(LabValue::from_str(i).is_err());
     }
 }
 
@@ -95,8 +93,7 @@ fn lch_string() {
     ];
 
     for i in good {
-        let b = LchValue::from_str(i).is_ok();
-        assert_eq!(b, true);
+        assert!(LchValue::from_str(i).is_ok());
     }
 
     let bad = &[
@@ -114,8 +111,7 @@ fn lch_string() {
     ];
 
     for i in bad {
-        let b = LchValue::from_str(i).is_err();
-        assert_eq!(b, true);
+        assert!(LchValue::from_str(i).is_err());
     }
 }
 
@@ -128,8 +124,7 @@ fn xyz_string() {
     ];
 
     for i in good {
-        let b = XyzValue::from_str(i).is_ok();
-        assert_eq!(b, true);
+        assert!(XyzValue::from_str(i).is_ok());
     }
 
     let bad = &[
@@ -142,8 +137,7 @@ fn xyz_string() {
     ];
 
     for i in bad {
-        let b = XyzValue::from_str(i).is_err();
-        assert_eq!(b, true);
+        assert!(XyzValue::from_str(i).is_err());
     }
 }
 
@@ -158,12 +152,12 @@ fn compare_de(method: DEMethod, expected: f32, reference: &[f32; 3], sample: &[f
 
 #[test]
 fn decmc1() {
-    compare_de(DEMethod::DECMC1, 17.4901, &[20.0, 30.0, 40.0], &[30.0, 40.0, 50.0]);
+    compare_de(DEMethod::DECMC(1.0, 1.0), 17.4901, &[20.0, 30.0, 40.0], &[30.0, 40.0, 50.0]);
 }
 
 #[test]
 fn decmc2() {
-    compare_de(DEMethod::DECMC2, 10.0731, &[20.0, 30.0, 40.0], &[30.0, 40.0, 50.0])
+    compare_de(DEMethod::DECMC(2.0, 1.0), 10.0731, &[20.0, 30.0, 40.0], &[30.0, 40.0, 50.0])
 }
 
 #[test]

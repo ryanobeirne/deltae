@@ -43,7 +43,7 @@ use std::fmt;
 use std::error::Error;
 use std::str::FromStr;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct LabValue {
     pub l: f32,
     pub a: f32,
@@ -51,26 +51,37 @@ pub struct LabValue {
 }
 
 impl LabValue {
+    /// New `LabValue` from 3 `f32`s
     pub fn new(l: f32, a: f32, b: f32) -> ValueResult<LabValue> {
-        //! New `LabValue` from 3 `f32`s
         LabValue {l, a, b}.validate()
     }
 
+    pub fn deltae(&self, other: &Self, method: DEMethod) -> DeltaE {
+        let value = match method {
+            DEMethod::DE1976 => delta_e_1976(&self, &other),
+            DEMethod::DE1994(textiles) => delta_e_1994(&self, &other, textiles),
+            DEMethod::DE2000 => delta_e_2000(&self, &other),
+            DEMethod::DECMC(t_l, t_c) => delta_e_cmc(&self, &other, t_l, t_c),
+        };
+
+        DeltaE { value, method }
+    }
+
+    /// Check that the Lab values are in the proper range or Error
     fn validate(self) -> ValueResult<LabValue> {
-        // Check that the Lab values are in the proper range or Error
         if  self.l < 0.0    || self.l > 100.0 ||
             self.a < -128.0 || self.a > 128.0 ||
             self.b < -128.0 || self.b > 128.0
         {
-            Err(ValueError::OutOfBounds)
+            Err(Box::new(ValueError::OutOfBounds))
         } else {
             Ok(self)
         }
     }
 
 
+    /// Convert `LabValue` to `LchValue`
     pub fn to_lch(&self) -> LchValue {
-        //! Convert `LabValue` to `LchValue`
         LchValue {
             l: self.l,
             c: ( self.a.powi(2) + self.b.powi(2) ).sqrt(),
@@ -94,8 +105,8 @@ impl LabValue {
         lab_to_xyz(self)
     }
 
+    /// Round `LabValue` to nearest decimal places.
     pub fn round_to(&self, places: i32) -> LabValue {
-        //! Round `LabValue` to nearest decimal places.
         LabValue {
             l: round_to(self.l, places),
             a: round_to(self.a, places),
@@ -103,13 +114,13 @@ impl LabValue {
         }       
     }
 
+    /// Returns an array of [L, a, b]
     pub fn to_a(&self) -> [f32; 3] {
-        //! Returns an array of [L, a, b]
         [self.l, self.a, self.b]
     }
 
+    /// Returns a `Vec<f32>` of [L, a, b]
     pub fn to_vec(&self) -> Vec<f32> {
-        //! Returns a `Vec<f32>` of [L, a, b]
         vec![self.l, self.a, self.b]
     }
 }
@@ -121,10 +132,8 @@ impl Default for LabValue {
 }
 
 impl FromStr for LabValue {
-    type Err = ValueError;
-
+    type Err = Box<dyn Error>;
     fn from_str(s: &str) -> ValueResult<LabValue> {
-        //! New `LabValue` from `&str`
         let split = parse_str_to_vecf32(s, 3)?;
 
         LabValue {
@@ -150,7 +159,6 @@ pub struct LchValue {
 
 impl LchValue {
     pub fn new(l: f32, c: f32, h: f32) -> ValueResult<LchValue> {
-        //! New `LchValue` from 3 `f32`s
         LchValue {l, c, h}.validate()
     }
 
@@ -160,14 +168,14 @@ impl LchValue {
             self.c < 0.0 || self.c > (128_f32.powi(2) + 128_f32.powi(2)).sqrt() ||
             self.h < 0.0 || self.h > 360.0
         {
-            Err(ValueError::OutOfBounds)
+            Err(Box::new(ValueError::OutOfBounds))
         } else {
             Ok(self)
         }
     }
 
+    /// Convert `LchValue` to `LabValue`
     pub fn to_lab(&self) -> LabValue {
-        //! Convert `LchValue` to `LabValue`
         LabValue {
             l: self.l,
             a: self.c * self.h.to_radians().cos(),
@@ -175,8 +183,8 @@ impl LchValue {
         }
     }
 
+    /// Round `LchValue` to nearest decimal places.
     pub fn round_to(&self, places: i32) -> LchValue {
-        //! Round `LchValue` to nearest decimal places.
         LchValue {
             l: round_to(self.l, places),
             c: round_to(self.c, places),
@@ -184,13 +192,13 @@ impl LchValue {
         }       
     }
 
+    /// Returns an array of [L, c, h]
     pub fn to_a(&self) -> [f32; 3] {
-        //! Returns an array of [L, c, h]
         [self.l, self.c, self.h]
     }
 
+    /// Returns a `Vec<f32>` of [L, c, h]
     pub fn to_vec(&self) -> Vec<f32> {
-        //! Returns a `Vec<f32>` of [L, c, h]
         vec![self.l, self.c, self.h]
     }
 }
@@ -202,10 +210,8 @@ impl Default for LchValue {
 }
 
 impl FromStr for LchValue {
-    type Err = ValueError;
-
+    type Err = Box<dyn Error>;
     fn from_str(s: &str) -> ValueResult<LchValue> {
-        //! New `LchValue` from `&str`
         let split = parse_str_to_vecf32(s, 3)?;
 
         LchValue {
@@ -231,7 +237,6 @@ pub struct XyzValue {
 
 impl XyzValue {
     pub fn new(x: f32, y: f32, z:f32) -> ValueResult<XyzValue> {
-        //! New `XyzValue` from 3 `f32`s
         XyzValue { x, y, z}.validate()
     }
 
@@ -253,7 +258,7 @@ impl XyzValue {
         self.y < 0.0 || self.y > 1.0 ||
         self.z < 0.0 || self.z > 1.0
         {
-            Err(ValueError::OutOfBounds)
+            Err(Box::new(ValueError::OutOfBounds))
         } else {
             Ok(self)
     }
@@ -268,10 +273,8 @@ impl Default for XyzValue {
 }
 
 impl FromStr for XyzValue {
-    type Err = ValueError;
-
+    type Err = Box<dyn Error>;
     fn from_str(s: &str) -> ValueResult<XyzValue> {
-        //! New `XyzValue` from `&str`
         let split = parse_str_to_vecf32(s, 3)?;
 
         XyzValue {
@@ -295,7 +298,7 @@ pub enum ValueError {
     BadFormat,
 }
 
-pub type ValueResult<T> = Result<T, ValueError>;
+pub type ValueResult<T> = Result<T, Box<dyn Error>>;
 
 impl fmt::Display for ValueError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -312,9 +315,9 @@ impl Error for ValueError {
     }
 }
 
+// Validate and convert strings to `LabValue`.
+// Split string by comma (92.5,33.5,-18.8).
 fn parse_str_to_vecf32(s: &str, length: usize) -> ValueResult<Vec<f32>> {
-    // Validate and convert strings to `LabValue`.
-    // Split string by comma (92.5,33.5,-18.8).
     let collection: Vec<&str> = s.split(",").collect();
     
     // Allow extraneous whitespace ("92.5, 33.5, -18.8")
@@ -329,7 +332,7 @@ fn parse_str_to_vecf32(s: &str, length: usize) -> ValueResult<Vec<f32>> {
 
     // Check if it's the right number of items
     if v.len() != length || split.len() != length {
-        return Err(ValueError::BadFormat);
+        return Err(Box::new(ValueError::BadFormat));
     }
 
     Ok(split)

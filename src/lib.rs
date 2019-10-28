@@ -30,6 +30,9 @@
 //!
 //!     assert_eq!(de0, de1.round_to(4));
 //!
+//!     let de3 = lab0.deltae(&lab1, DE2000);
+//!     assert_eq!(de0, de3.round_to(4));
+//!
 //!     let lch0 = lab0.to_lch();
 //!     let lab2 = lch0.to_lab();
 //!
@@ -40,7 +43,9 @@
 //! ```
 
 use std::fmt;
+use std::io;
 pub use std::str::FromStr;
+pub use DEMethod::*;
 
 pub mod color;
 use color::*;
@@ -52,43 +57,32 @@ mod tests;
 pub struct DeltaE {
     pub method: DEMethod,
     pub value: f32,
-    pub color0: LabValue,
-    pub color1: LabValue,
 }
 
 impl DeltaE {
+    /// New `DeltaE` from `LabValues` and `DEMethod`.
     pub fn new(lab_0: &LabValue, lab_1: &LabValue, method: DEMethod) -> DeltaE {
-    //! New `DeltaE` from `LabValues` and `DEMethod`.
         let value = match method {
             DEMethod::DE2000  => delta_e_2000(lab_0, lab_1),
-            DEMethod::DE1994  => delta_e_1994(lab_0, lab_1, false),
-            DEMethod::DE1994T => delta_e_1994(lab_0, lab_1, true),
+            DEMethod::DE1994(textiles)  => delta_e_1994(lab_0, lab_1, textiles),
             DEMethod::DE1976  => delta_e_1976(lab_0, lab_1),
-            DEMethod::DECMC1  => delta_e_cmc(lab_0, lab_1, 1.0, 1.0),
-            DEMethod::DECMC2  => delta_e_cmc(lab_0, lab_1, 2.0, 1.0),
+            DEMethod::DECMC(t_l, t_c)  => delta_e_cmc(lab_0, lab_1, t_l, t_c),
         };
 
-        let color0 = lab_0.to_owned();
-        let color1 = lab_1.to_owned();
-
-        DeltaE { method, value, color0, color1 }
+        DeltaE { method, value }
     }
 
-    pub fn round_to(&self, places: i32) -> Self {
-        //! Round `DeltaE` value and its components to nearest decimal places
-        Self {
-            method: self.method.clone(),
-            value: round_to(self.value, places),
-            color0: self.color0.round_to(places),
-            color1: self.color1.round_to(places)
-        }.clone()
+    /// Round `DeltaE` value and its components to nearest decimal places
+    pub fn round_to(mut self, places: i32) -> Self {
+        self.value = round_to(self.value, places);
+        self
     }
 
+    /// Parse `DeltaE` from `&str`'s
     pub fn from(color_0: &str, color_1: &str, method: &str) -> ValueResult<DeltaE> {
-        //! Parse `DeltaE` from `&str`'s
         let lab_0 = LabValue::from_str(color_0)?;
         let lab_1 = LabValue::from_str(color_1)?;
-        let meth = DEMethod::from_str(method).unwrap();
+        let meth = DEMethod::from_str(method)?;
 
         let de = DeltaE::new(&lab_0, &lab_1, meth);
 
@@ -107,15 +101,27 @@ fn round_to(val: f32, places: i32) -> f32 {
     (val * mult).round() / mult
 }
 
+/// The multiple DeltaE methods are used for different purposes.
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum DEMethod{
+    /// The default DeltaE method
     DE2000,
-    DE1994,
-    DE1994T,
+    /// CIE94 DeltaE implementation, weighted with or without a tolerance for textiles
+    DE1994(bool),
+    /// The original DeltaE implementation, a basic euclidian distance formula
     DE1976,
-    DECMC1,
-    DECMC2,
+    /// An implementation of DeltaE with tolerances for Lightness and Chroma
+    DECMC(f32, f32),
 }
+
+impl Eq for DEMethod {}
+
+/// DeltaE 1994 Textiles
+pub const DE1994T: DEMethod = DE1994(true);
+/// DeltaE CMC (1:1)
+pub const DECMC1: DEMethod = DECMC(1.0, 1.0);
+/// DeltaE CMC (2:1)
+pub const DECMC2: DEMethod = DECMC(2.0, 1.0);
 
 impl Default for DEMethod {
     fn default() -> DEMethod {
@@ -126,34 +132,35 @@ impl Default for DEMethod {
 impl FromStr for DEMethod {
     type Err = std::io::Error;
     fn from_str(s: &str) -> Result<DEMethod, Self::Err> {
-        //! Parse `DEMethod` from `&str`. Always returns `Ok()`. DE2000 is default.
-        match s.to_lowercase().as_ref() {
+        match s.to_lowercase().trim() {
             "de2000"  | "de00"  | "2000"  | "00"  => Ok(DEMethod::DE2000),
             "de1976"  | "de76"  | "1976"  | "76"  => Ok(DEMethod::DE1976),
             "de1994"  | "de94"  | "1994"  | "94" |
-            "de1994g" | "de94g" | "1994g" | "94g" => Ok(DEMethod::DE1994),
-            "de1994t" | "de94t" | "1994t" | "94t" => Ok(DEMethod::DE1994T),
-            "decmc"   | "decmc1"| "cmc1"  | "cmc" => Ok(DEMethod::DECMC1),
-            "decmc2"  | "cmc2"                    => Ok(DEMethod::DECMC2),
-            _ => {
-                eprintln!("Invalid Method: '{}'. Using default: {}", s, DEMethod::default());
-                Ok(DEMethod::default())
-            }
+            "de1994g" | "de94g" | "1994g" | "94g" => Ok(DEMethod::DE1994(false)),
+            "de1994t" | "de94t" | "1994t" | "94t" => Ok(DEMethod::DE1994(true)),
+            "decmc"   | "decmc1"| "cmc1"  | "cmc" => Ok(DEMethod::DECMC(1.0, 1.0)),
+            "decmc2"  | "cmc2"                    => Ok(DEMethod::DECMC(2.0, 1.0)),
+            _ => Err(io::Error::from(io::ErrorKind::InvalidInput)),
         }
     }
 }
 
 impl fmt::Display for DEMethod {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
+        match self {
+            DE1994(true) => write!(f, "DE1994T"),
+            DECMC(tl, tc) => write!(f, "DECMC({:0.2}:{:0.2})", tl, tc),
+            _ => write!(f, "{:?}", self)
+        }
     }
 }
 
+/// DeltaE 1976. Basic euclidian distance formula.
 fn delta_e_1976(lab_0: &LabValue, lab_1: &LabValue) -> f32 {
-    //! DeltaE 1976. Basic euclidian distance formula.
     ( (lab_0.l - lab_1.l).powi(2) + (lab_0.a - lab_1.a).powi(2) + (lab_0.b - lab_1.b).powi(2) ).sqrt()
 }
 
+/// DeltaE 1994. Weighted for textiles (`true`) or graphics (`false`)
 fn delta_e_1994(lab_0: &LabValue, lab_1: &LabValue, textiles: bool) -> f32 {
     let delta_l = lab_0.l - lab_1.l;
     let chroma_0 = (lab_0.a.powi(2) + lab_0.b.powi(2)).sqrt();
@@ -163,38 +170,32 @@ fn delta_e_1994(lab_0: &LabValue, lab_1: &LabValue, textiles: bool) -> f32 {
     let delta_b = lab_0.b - lab_1.b;
     let delta_hue = (delta_a.powi(2) + delta_b.powi(2) - delta_chroma.powi(2)).sqrt();
 
-    struct K {
-        kl: f32,
-        k1: f32,
-        k2: f32,
-    }
-
-    let k = if textiles {
-        K {kl: 2.0, k1: 0.048, k2: 0.014}
-    } else {
-        K {kl: 1.0, k1: 0.045, k2: 0.015}
+    let (kl, k1, k2) = match textiles {
+        true  => (2.0, 0.048, 0.014),
+        false => (1.0, 0.045, 0.015),
     };
 
     let s_l = 1.0;
-    let s_c = 1.0 + k.k1 * chroma_0;
-    let s_h = 1.0 + k.k2 * chroma_0;
+    let s_c = 1.0 + k1 * chroma_0;
+    let s_h = 1.0 + k2 * chroma_0;
 
-    (   (delta_l / k.kl * s_l).powi(2)
+    (   (delta_l / kl * s_l).powi(2)
       + (delta_chroma / s_c).powi(2)
       + (delta_hue / s_h).powi(2)
     ).sqrt()
 }
 
 fn get_h_prime(a: f32, b: f32) -> f32 {
-    let mut h_prime = b.atan2(a).to_degrees();
+    let h_prime = b.atan2(a).to_degrees();
     if h_prime < 0.0 {
-        h_prime += 360.0;
-    }
-    h_prime
+        h_prime + 360.0
+    } else {
+        h_prime
+    }           
 }
 
+/// DeltaE 2000. This is a ridiculously complicated formula.
 fn delta_e_2000(lab_0: &LabValue, lab_1: &LabValue) -> f32 {
-    //! DeltaE 2000. This is a ridiculously complicated formula.
     let chroma_0 = (lab_0.a.powi(2) + lab_0.b.powi(2)).sqrt();
     let chroma_1 = (lab_1.a.powi(2) + lab_1.b.powi(2)).sqrt();
 
@@ -265,6 +266,7 @@ fn delta_e_2000(lab_0: &LabValue, lab_1: &LabValue) -> f32 {
     de2000
 }
 
+/// Custom weighted DeltaE formula
 fn delta_e_cmc(lab0: &LabValue, lab1 :&LabValue, tolerance_l: f32, tolerance_c: f32) -> f32 {
     let chroma_0 = (lab0.a.powi(2) + lab0.b.powi(2)).sqrt();
     let chroma_1 = (lab1.a.powi(2) + lab1.b.powi(2)).sqrt();
