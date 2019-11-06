@@ -15,8 +15,7 @@
 //! # Examples
 //! 
 //! ```
-//! extern crate deltae;
-//! use deltae::color::{LabValue, LchValue};
+//! use deltae::*;
 //! use std::str::FromStr;
 //! 
 //! fn main() {
@@ -29,8 +28,8 @@
 //! 
 //!     assert_eq!(lab0, lab1);
 //! 
-//!     let lch0 = lab0.to_lch();
-//!     let lab2 = lch0.to_lab();
+//!     let lch0 = LchValue::from(lab0);
+//!     let lab2 = LabValue::from(lch0);
 //! 
 //!     println!("{}", lch0); // [L:89.73, c:7.2094, h:285.1157]
 //! 
@@ -42,7 +41,12 @@ use super::*;
 use std::fmt;
 use std::error::Error;
 use std::str::FromStr;
+use std::convert::TryFrom;
 
+/// The CIELab type
+/// L*: Black <---> White   (0.00 <---> 100)
+/// a*: Green <---> Magenta (-128 <---> 128)
+/// b*: Blue  <---> Yellow  (-128 <---> 128)
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct LabValue {
     pub l: f32,
@@ -56,53 +60,16 @@ impl LabValue {
         LabValue {l, a, b}.validate()
     }
 
-    pub fn deltae(&self, other: &Self, method: DEMethod) -> DeltaE {
+    pub fn deltae<L: Into<LabValue>>(&self, lab1: L, method: DEMethod) -> DeltaE {
+        let lab1: LabValue = lab1.into();
         let value = match method {
-            DEMethod::DE1976 => delta_e_1976(&self, &other),
-            DEMethod::DE1994(textiles) => delta_e_1994(&self, &other, textiles),
-            DEMethod::DE2000 => delta_e_2000(&self, &other),
-            DEMethod::DECMC(t_l, t_c) => delta_e_cmc(&self, &other, t_l, t_c),
+            DEMethod::DE1976 => delta_e_1976(&self, &lab1),
+            DEMethod::DE1994(textiles) => delta_e_1994(&self, &lab1, textiles),
+            DEMethod::DE2000 => delta_e_2000(&self, &lab1),
+            DEMethod::DECMC(t_l, t_c) => delta_e_cmc(&self, &lab1, t_l, t_c),
         };
 
         DeltaE { value, method }
-    }
-
-    /// Check that the Lab values are in the proper range or Error
-    fn validate(self) -> ValueResult<LabValue> {
-        if  self.l < 0.0    || self.l > 100.0 ||
-            self.a < -128.0 || self.a > 128.0 ||
-            self.b < -128.0 || self.b > 128.0
-        {
-            Err(Box::new(ValueError::OutOfBounds))
-        } else {
-            Ok(self)
-        }
-    }
-
-
-    /// Convert `LabValue` to `LchValue`
-    pub fn to_lch(&self) -> LchValue {
-        LchValue {
-            l: self.l,
-            c: ( self.a.powi(2) + self.b.powi(2) ).sqrt(),
-            h: get_h_prime(self.a, self.b),
-        }
-    }
-
-    pub fn chroma(&self) -> f32 {
-        self.to_lch().c
-    }
-
-    pub fn hue(&self) -> f32 {
-        self.to_lch().h
-    }
-
-    pub fn hue_radians(&self) -> f32 {
-        self.to_lch().h.to_radians()
-    }
-
-    pub fn to_xyz(&self) -> XyzValue {
-        lab_to_xyz(self)
     }
 
     /// Round `LabValue` to nearest decimal places.
@@ -112,16 +79,6 @@ impl LabValue {
             a: round_to(self.a, places),
             b: round_to(self.b, places),
         }       
-    }
-
-    /// Returns an array of [L, a, b]
-    pub fn to_a(&self) -> [f32; 3] {
-        [self.l, self.a, self.b]
-    }
-
-    /// Returns a `Vec<f32>` of [L, a, b]
-    pub fn to_vec(&self) -> Vec<f32> {
-        vec![self.l, self.a, self.b]
     }
 }
 
@@ -150,7 +107,11 @@ impl fmt::Display for LabValue {
     }
 }
 
-#[derive(Debug, PartialEq, Clone)]
+/// The CIELch type
+/// L Lightness: (0.00 <---> 100)
+/// C Chroma:    (0 <---> 128)
+/// H Hue:       (0 <---> 360°)
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct LchValue {
     pub l: f32,
     pub c: f32,
@@ -159,28 +120,7 @@ pub struct LchValue {
 
 impl LchValue {
     pub fn new(l: f32, c: f32, h: f32) -> ValueResult<LchValue> {
-        LchValue {l, c, h}.validate()
-    }
-
-    fn validate(self) -> ValueResult<LchValue> {
-        // Check that the Lab values are in the proper range or Error
-        if  self.l < 0.0 || self.l > 100.0 ||
-            self.c < 0.0 || self.c > (128_f32.powi(2) + 128_f32.powi(2)).sqrt() ||
-            self.h < 0.0 || self.h > 360.0
-        {
-            Err(Box::new(ValueError::OutOfBounds))
-        } else {
-            Ok(self)
-        }
-    }
-
-    /// Convert `LchValue` to `LabValue`
-    pub fn to_lab(&self) -> LabValue {
-        LabValue {
-            l: self.l,
-            a: self.c * self.h.to_radians().cos(),
-            b: self.c * self.h.to_radians().sin(),
-        }
+        LchValue::try_from(&[l,c,h])
     }
 
     /// Round `LchValue` to nearest decimal places.
@@ -200,6 +140,10 @@ impl LchValue {
     /// Returns a `Vec<f32>` of [L, c, h]
     pub fn to_vec(&self) -> Vec<f32> {
         vec![self.l, self.c, self.h]
+    }
+
+    pub fn hue_radians(&self) -> f32 {
+        self.h.to_radians()
     }
 }
 
@@ -228,7 +172,7 @@ impl fmt::Display for LchValue {
     }
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct XyzValue {
     pub x: f32,
     pub y: f32,
@@ -237,11 +181,7 @@ pub struct XyzValue {
 
 impl XyzValue {
     pub fn new(x: f32, y: f32, z:f32) -> ValueResult<XyzValue> {
-        XyzValue { x, y, z}.validate()
-    }
-
-    pub fn to_lab(&self) -> LabValue {
-        xyz_to_lab([self.x, self.y, self.z])
+        XyzValue {x, y, z}.validate()
     }
 
     pub fn round_to(&self, places: i32) -> XyzValue {
@@ -251,19 +191,6 @@ impl XyzValue {
             z: round_to(self.z, places),
         }
     }
-
-    fn validate(self) -> ValueResult<XyzValue> {
-        // Check that the XYZ values are in the proper range or Error
-        if self.x < 0.0 || self.x > 1.0 ||
-        self.y < 0.0 || self.y > 1.0 ||
-        self.z < 0.0 || self.z > 1.0
-        {
-            Err(Box::new(ValueError::OutOfBounds))
-        } else {
-            Ok(self)
-    }
-}
-
 }
 
 impl Default for XyzValue {
@@ -338,36 +265,9 @@ fn parse_str_to_vecf32(s: &str, length: usize) -> ValueResult<Vec<f32>> {
     Ok(split)
 }
 
-const KAPPA: f32 = 24389.0 / 27.0;
-const EPSILON: f32 = 216.0 / 24389.0;
-const CBRT_EPSILON: f32 = 0.20689655172413796;
-
-fn lab_to_xyz(lab: &LabValue) -> XyzValue {
-    let fy = (lab.l + 16.0) / 116.0;
-    let fx = (lab.a / 500.0) + fy;
-    let fz = fy - (lab.b / 200.0);
-    let xr = if fx > CBRT_EPSILON {
-        fx.powi(3)
-    } else {
-        ((fx * 116.0) - 16.0) / KAPPA
-    };
-    let yr = if lab.l > EPSILON * KAPPA {
-        fy.powi(3)
-    } else {
-        lab.l / KAPPA
-    };
-    let zr = if fz > CBRT_EPSILON {
-        fz.powi(3)
-    } else {
-        ((fz * 116.0) - 16.0) / KAPPA
-    };
-
-    XyzValue {
-        x: xr * 0.95047,
-        y: yr,
-        z: zr * 1.08883,
-    }
-}
+pub const KAPPA: f32 = 24389.0 / 27.0;
+pub const EPSILON: f32 = 216.0 / 24389.0;
+pub const CBRT_EPSILON: f32 = 0.20689655172413796;
 
 #[inline]
 fn xyz_to_lab_map(c: f32) -> f32 {
@@ -378,7 +278,7 @@ fn xyz_to_lab_map(c: f32) -> f32 {
     }
 }
 
-fn xyz_to_lab(xyz: [f32; 3]) -> LabValue {
+pub fn xyz_to_lab(xyz: [f32; 3]) -> LabValue {
     let x = xyz_to_lab_map(xyz[0] / 0.95047);
     let y = xyz_to_lab_map(xyz[1]);
     let z = xyz_to_lab_map(xyz[2] / 1.08883);

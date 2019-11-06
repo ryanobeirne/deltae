@@ -1,6 +1,9 @@
 use super::*;
 use color::{LabValue, LchValue, XyzValue};
 
+#[cfg(test)]
+use std::convert::TryFrom;
+
 #[test]
 fn round() {
     let val = 1.234567890;
@@ -17,8 +20,8 @@ fn lab_to_lch() {
         b: 50.0,
     };
 
-    let lch  = lab.to_lch();
-    let lab2 = lch.to_lab();
+    let lch  = LchValue::from(lab);
+    let lab2 = LabValue::from(lch);
     assert_eq!(lab.round_to(4), lab2.round_to(4));
 }
 
@@ -30,8 +33,8 @@ fn lch_to_lab() {
         h: 50.0,
     };
 
-    let lab  = lch.to_lab();
-    let lch2 = lab.to_lch();
+    let lab  = LabValue::from(lch);
+    let lch2 = LchValue::from(lab);
     assert_eq!(lch.round_to(4), lch2.round_to(4));
 }
 
@@ -43,8 +46,8 @@ fn lab_to_xyz() {
         b: 50.0,
     };
 
-    let xyz  = lab.to_xyz();
-    let lab2 = xyz.to_lab();
+    let xyz  = XyzValue::from(lab);
+    let lab2 = LabValue::from(xyz);
     assert_eq!(lab.round_to(4), lab2.round_to(4));
 }
 
@@ -141,23 +144,25 @@ fn xyz_string() {
     }
 }
 
-fn compare_de(method: DEMethod, expected: f32, reference: &[f32; 3], sample: &[f32; 3]) {
-    let lab0 = LabValue::new(reference[0], reference[1], reference[2]).unwrap().to_lch().to_lab();
-    let lab1 = LabValue::new(sample[0],    sample[1],    sample[2])   .unwrap().to_lch().to_lab();
+fn compare_de(method: DEMethod, expected: f32, reference: &[f32; 3], sample: &[f32; 3]) -> ValueResult<()> {
+    let lab0 = LabValue::try_from(reference)?;
+    let lab1 = LabValue::try_from(sample)?;
 
     let de = DeltaE::new(&lab0, &lab1, method).round_to(4).value;
 
     assert_eq!(expected, de);
+
+    Ok(())
 }
 
 #[test]
 fn decmc1() {
-    compare_de(DEMethod::DECMC(1.0, 1.0), 17.4901, &[20.0, 30.0, 40.0], &[30.0, 40.0, 50.0]);
+    assert!(compare_de(DEMethod::DECMC(1.0, 1.0), 17.4901, &[20.0, 30.0, 40.0], &[30.0, 40.0, 50.0]).is_ok());
 }
 
 #[test]
 fn decmc2() {
-    compare_de(DEMethod::DECMC(2.0, 1.0), 10.0731, &[20.0, 30.0, 40.0], &[30.0, 40.0, 50.0])
+    assert!(compare_de(DEMethod::DECMC(2.0, 1.0), 10.0731, &[20.0, 30.0, 40.0], &[30.0, 40.0, 50.0]).is_ok());
 }
 
 #[test]
@@ -168,12 +173,12 @@ fn de1976_test_set() {
         (5.0000,   &[0.0000,  0.0000,    0.0000  ], &[0.0000,   -3.0000,   -4.0000  ]),
         (50.0000,  &[0.0000,  0.0000,    0.0000  ], &[0.0000,   -30.0000,  -40.0000 ]),
         (181.0193, &[0.0000,  0.0000,    0.0000  ], &[0.0000,    128.0000,  128.0000]),
-        (362.0386, &[0.0000, -128.0000, -128.0000], &[0.0000,    128.0000,  128.0000]),
+        (362.0387, &[0.0000, -128.0000, -128.0000], &[0.0000,    128.0000,  128.0000]),
         (375.5955, &[0.0000, -128.0000, -128.0000], &[100.0000,  128.0000,  128.0000])
     ];
 
     for (expected, reference, sample) in set {
-        compare_de(DEMethod::DE1976, expected, reference, sample);
+        assert!(compare_de(DEMethod::DE1976, expected, reference, sample).is_ok());
     }
 }
 

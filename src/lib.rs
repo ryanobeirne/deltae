@@ -3,9 +3,7 @@
 //! # Examples
 //! 
 //! ```
-//! extern crate deltae;
-//! use deltae::{DeltaE, DEMethod::DE2000};
-//! use deltae::color::LabValue;
+//! use deltae::*;
 //! use std::str::FromStr;
 //!
 //! fn main() {
@@ -33,8 +31,8 @@
 //!     let de3 = lab0.deltae(&lab1, DE2000);
 //!     assert_eq!(de0, de3.round_to(4));
 //!
-//!     let lch0 = lab0.to_lch();
-//!     let lab2 = lch0.to_lab();
+//!     let lch0 = LchValue::from(lab0);
+//!     let lab2 = LabValue::from(lch0);
 //!
 //!     println!("{}", lch0); // [L:89.73, c:7.2094, h:285.1157]
 //!
@@ -48,7 +46,13 @@ pub use std::str::FromStr;
 pub use DEMethod::*;
 
 pub mod color;
-use color::*;
+pub use color::*;
+
+pub mod convert;
+pub use convert::*;
+
+pub mod validate;
+pub use validate::*;
 
 #[cfg(test)]
 mod tests;
@@ -61,12 +65,15 @@ pub struct DeltaE {
 
 impl DeltaE {
     /// New `DeltaE` from `LabValues` and `DEMethod`.
-    pub fn new(lab_0: &LabValue, lab_1: &LabValue, method: DEMethod) -> DeltaE {
+    pub fn new<A, B>(a: A, b: B, method: DEMethod) -> DeltaE
+    where A: Into<LabValue>, B: Into<LabValue> {
+        let lab_a: LabValue = a.into();
+        let lab_b: LabValue = b.into();
         let value = match method {
-            DEMethod::DE2000  => delta_e_2000(lab_0, lab_1),
-            DEMethod::DE1994(textiles)  => delta_e_1994(lab_0, lab_1, textiles),
-            DEMethod::DE1976  => delta_e_1976(lab_0, lab_1),
-            DEMethod::DECMC(t_l, t_c)  => delta_e_cmc(lab_0, lab_1, t_l, t_c),
+            DEMethod::DE2000  => delta_e_2000(&lab_a, &lab_b),
+            DEMethod::DE1994(textiles)  => delta_e_1994(&lab_a, &lab_b, textiles),
+            DEMethod::DE1976  => delta_e_1976(&lab_a, &lab_b),
+            DEMethod::DECMC(t_l, t_c)  => delta_e_cmc(&lab_a, &lab_b, t_l, t_c),
         };
 
         DeltaE { method, value }
@@ -96,6 +103,7 @@ impl fmt::Display for DeltaE {
     }
 }
 
+// Round an f32 to a number of decimal places
 fn round_to(val: f32, places: i32) -> f32 {
     let mult = 10_f32.powi(places);
     (val * mult).round() / mult
@@ -114,14 +122,14 @@ pub enum DEMethod{
     DECMC(f32, f32),
 }
 
-impl Eq for DEMethod {}
-
 /// DeltaE 1994 Textiles
 pub const DE1994T: DEMethod = DE1994(true);
 /// DeltaE CMC (1:1)
 pub const DECMC1: DEMethod = DECMC(1.0, 1.0);
 /// DeltaE CMC (2:1)
 pub const DECMC2: DEMethod = DECMC(2.0, 1.0);
+
+impl Eq for DEMethod {}
 
 impl Default for DEMethod {
     fn default() -> DEMethod {
@@ -148,8 +156,19 @@ impl FromStr for DEMethod {
 impl fmt::Display for DEMethod {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            DE1994(true) => write!(f, "DE1994T"),
-            DECMC(tl, tc) => write!(f, "DECMC({:0.2}:{:0.2})", tl, tc),
+            DE1994(textiles) => match textiles {
+                true  => write!(f, "DE1994T"),
+                false => write!(f, "DE1994"),
+            }
+            DECMC(tl, tc) => {
+                if (tl, tc) == (&1.0, &1.0) {
+                    write!(f, "DECMC1")
+                } else if (tl, tc) == (&2.0, &1.0) {
+                    write!(f, "DECMC2")
+                } else {
+                    write!(f, "DECMC({:0.2}:{:0.2})", tl, tc)
+                }
+            }
             _ => write!(f, "{:?}", self)
         }
     }
