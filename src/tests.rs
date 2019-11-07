@@ -1,8 +1,7 @@
 use super::*;
 use color::{LabValue, LchValue, XyzValue};
-
-#[cfg(test)]
 use std::convert::TryFrom;
+use std::str::FromStr;
 
 #[test]
 fn round() {
@@ -148,7 +147,7 @@ fn compare_de(method: DEMethod, expected: f32, reference: &[f32; 3], sample: &[f
     let lab0 = LabValue::try_from(reference)?;
     let lab1 = LabValue::try_from(sample)?;
 
-    let de = DeltaE::new(&lab0, &lab1, method).round_to(4).value;
+    let de = lab0.delta(lab1, method).round_to(4).value;
 
     assert_eq!(expected, de);
 
@@ -167,7 +166,7 @@ fn decmc2() {
 
 #[test]
 fn de1976_test_set() {
-    let set = vec![
+    let set = &[
         (0.0000,   &[0.0000,  0.0000,    0.0000  ], &[0.0000,    0.0000,    0.0000  ]),
         (5.0000,   &[0.0000,  0.0000,    0.0000  ], &[0.0000,    3.0000,    4.0000  ]),
         (5.0000,   &[0.0000,  0.0000,    0.0000  ], &[0.0000,   -3.0000,   -4.0000  ]),
@@ -177,8 +176,8 @@ fn de1976_test_set() {
         (375.5955, &[0.0000, -128.0000, -128.0000], &[100.0000,  128.0000,  128.0000])
     ];
 
-    for (expected, reference, sample) in set {
-        assert!(compare_de(DEMethod::DE1976, expected, reference, sample).is_ok());
+    for (expected, reference, sample) in set.iter() {
+        assert!(compare_de(DEMethod::DE1976, *expected, reference, sample).is_ok());
     }
 }
 
@@ -191,7 +190,7 @@ fn de1976_test_set() {
 
 #[test]
 fn de2000_test_set() {
-    let set = vec![
+    let set = &[
         (0.0000,   &[0.0000,   0.0000,   0.0000 ], &[0.0000,   0.0000,   0.0000 ]),
         (0.0000,   &[99.5000,  0.0050,  -0.0100 ], &[99.5000,  0.0050,  -0.0100 ]),
         (100.0000, &[100.0000, 0.0050,  -0.0100 ], &[0.0000,   0.0000,   0.0000 ]),
@@ -230,7 +229,7 @@ fn de2000_test_set() {
         (0.9082,   &[2.0776,   0.0795,  -1.1350 ], &[0.9033,  -0.0636,   -0.5514])
     ];
 
-    for (expected, reference, sample) in set {
-        compare_de(DEMethod::DE2000, expected, reference, sample);
+    for (expected, reference, sample) in set.iter() {
+        assert!(compare_de(DEMethod::DE2000, *expected, reference, sample).is_ok())
     }
 }
