@@ -28,7 +28,6 @@
 //! }
 //! ```
 
-use super::*;
 use super::validate::*;
 use std::fmt;
 use std::error::Error;
@@ -53,15 +52,6 @@ impl LabValue {
     /// New `LabValue` from 3 `f32`s
     pub fn new(l: f32, a: f32, b: f32) -> ValueResult<LabValue> {
         LabValue {l, a, b}.validate()
-    }
-
-    /// Round `LabValue` to nearest decimal places.
-    pub fn round_to(&self, places: i32) -> LabValue {
-        LabValue {
-            l: round_to(self.l, places),
-            a: round_to(self.a, places),
-            b: round_to(self.b, places),
-        }
     }
 }
 
@@ -95,15 +85,6 @@ pub struct LchValue {
 impl LchValue {
     pub fn new(l: f32, c: f32, h: f32) -> ValueResult<LchValue> {
         LchValue::try_from(&[l, c, h])
-    }
-
-    /// Round `LchValue` to nearest decimal places.
-    pub fn round_to(&self, places: i32) -> LchValue {
-        LchValue {
-            l: round_to(self.l, places),
-            c: round_to(self.c, places),
-            h: round_to(self.h, places),
-        }
     }
 
     /// Returns an array of [L, c, h]
@@ -151,14 +132,6 @@ pub struct XyzValue {
 impl XyzValue {
     pub fn new(x: f32, y: f32, z:f32) -> ValueResult<XyzValue> {
         XyzValue {x, y, z}.validate()
-    }
-
-    pub fn round_to(&self, places: i32) -> XyzValue {
-        XyzValue {
-            x: round_to(self.x, places),
-            y: round_to(self.y, places),
-            z: round_to(self.z, places),
-        }
     }
 }
 

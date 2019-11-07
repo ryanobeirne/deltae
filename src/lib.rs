@@ -6,6 +6,7 @@
 //! use deltae::*;
 //! use std::str::FromStr;
 //! use std::error::Error;
+//! use std::convert::TryFrom;
 //!
 //! fn main() -> Result<(), Box<dyn Error>> {
 //!     let lab0 = LabValue::from_str("89.73, 1.88, -6.96")?;
@@ -14,6 +15,8 @@
 //!         a: -0.17,
 //!         b: -10.81,
 //!     }.validate()?;
+//!     let lab2 = LabValue::try_from(&[89.73, 1.88, -6.96])?;
+//!     assert_eq!(lab0, lab2);
 //!
 //!     println!("{}", &lab0); // [L:89.73, a:1.88, b:-6.96]
 //!
@@ -25,35 +28,24 @@
 //! }
 //! ```
 
-#[test]
-fn derp() {
-    //use std::convert::TryFrom;
-    let lab = LabValue {l: 95.08, a: -0.17, b: -10.81}.validate().unwrap();
-    let lch = LchValue::from(lab);
-    let de = lab.delta(lch, DE1976);
-    dbg!(lab, lch, LabValue::from(lch), de);
-    assert_eq!(lab, lch);
-    //let xyz = XyzValue::try_from(&[0.5, 0.5, 0.5]).unwrap();
-    //let de  = lch.delta(xyz, DE2000);
-    //dbg!(lch, xyz, de);
-}
-
+mod color;
 mod convert;
-mod eq;
-pub mod color;
-mod validate;
 mod delta;
-
-pub use delta::*;
-pub use validate::*;
-pub use DEMethod::*;
-pub use color::*;
-
-use std::fmt;
-use std::io;
+mod eq;
+mod round;
+mod validate;
 
 #[cfg(test)]
 mod tests;
+
+pub use DEMethod::*;
+pub use color::*;
+pub use delta::*;
+pub use round::*;
+pub use validate::*;
+
+use std::fmt;
+use std::io;
 
 /// ## The measured difference between two colors
 ///
@@ -68,14 +60,8 @@ pub struct DeltaE {
 impl DeltaE {
     /// New `DeltaE` from `LabValues` and `DEMethod`.
     pub fn new<A, B>(a: A, b: B, method: DEMethod) -> DeltaE
-    where A: Into<LabValue>, B: Into<LabValue> {
+    where A: Delta, B: Delta {
         a.delta(b, method)
-    }
-
-    /// Round `DeltaE` value and its components to nearest decimal places
-    pub fn round_to(mut self, places: i32) -> Self {
-        self.value = round_to(self.value, places);
-        self
     }
 }
 
@@ -91,23 +77,17 @@ impl PartialOrd for DeltaE {
     }
 }
 
-// Round an f32 to a number of decimal places
-fn round_to(val: f32, places: i32) -> f32 {
-    let mult = 10_f32.powi(places);
-    (val * mult).round() / mult
-}
-
-/// The multiple DeltaE methods are used for different purposes.
+/// The most common DeltaE methods
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum DEMethod{
     /// The default DeltaE method
     DE2000,
+    /// An implementation of DeltaE with tolerances for Lightness and Chroma
+    DECMC(f32, f32),
     /// CIE94 DeltaE implementation, weighted with or without a tolerance for textiles
     DE1994(bool),
     /// The original DeltaE implementation, a basic euclidian distance formula
     DE1976,
-    /// An implementation of DeltaE with tolerances for Lightness and Chroma
-    DECMC(f32, f32),
 }
 
 /// DeltaE 1994 Textiles
