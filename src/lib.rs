@@ -1,5 +1,6 @@
 #![warn(missing_docs)]
-//! Calculate Delta E (color difference) between two colors in CIE Lab space.
+//! Calculate [Delta E](http://www.colorwiki.com/wiki/Delta_E:_The_Color_Difference)
+//! (color difference) between two colors in CIE Lab space.
 //!
 //! # Examples
 //!
@@ -75,7 +76,7 @@ pub(crate) type ValueResult<T> = Result<T, color::ValueError>;
 ///
 /// There are many different methods of calculating color difference.
 /// Different methods have a specific purpose, mainly in determining the level
-/// of tolerance for describing die difference between two colors.
+/// of tolerance for describing the difference between two colors.
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct DeltaE {
     /// The mathematical method used for calculating color difference
