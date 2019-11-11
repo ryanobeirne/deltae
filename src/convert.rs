@@ -27,9 +27,9 @@ impl From<&LabValue> for LabValue {
 
 impl From<XyzValue> for LabValue {
     fn from(xyz: XyzValue) -> LabValue {
-        let x = xyz_to_lab_map(xyz.x / 0.95047);
+        let x = xyz_to_lab_map(xyz.x / 0.9642);
         let y = xyz_to_lab_map(xyz.y);
-        let z = xyz_to_lab_map(xyz.z / 1.08883);
+        let z = xyz_to_lab_map(xyz.z / 0.8251);
 
         LabValue {
             l: (116.0 * y) - 16.0,
@@ -169,9 +169,9 @@ impl From<LabValue> for XyzValue {
         };
 
         XyzValue {
-            x: xr * 0.95047,
+            x: xr * 0.9642,
             y: yr,
-            z: zr * 1.08883,
+            z: zr * 0.8251,
         }
     }
 }
@@ -290,6 +290,11 @@ impl FromStr for XyzValue {
 
 }
 
+// Helper Functions ////////////////////////////////////////////////////////////
+const KAPPA: f32 = 24389.0 / 27.0; // CIE Standard: 903.3
+const EPSILON: f32 = 216.0 / 24389.0; // CIE Standard: 0.008856
+const CBRT_EPSILON: f32 = 0.20689655172413796;
+
 pub fn get_h_prime(a: f32, b: f32) -> f32 {
     let h_prime = b.atan2(a).to_degrees();
     if h_prime < 0.0 {
@@ -321,10 +326,6 @@ fn parse_str_to_vecf32(s: &str, length: usize) -> ValueResult<Vec<f32>> {
 
     Ok(split)
 }
-
-const KAPPA: f32 = 24389.0 / 27.0;
-const EPSILON: f32 = 216.0 / 24389.0;
-const CBRT_EPSILON: f32 = 0.20689655172413796;
 
 #[inline]
 fn xyz_to_lab_map(c: f32) -> f32 {

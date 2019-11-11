@@ -10,7 +10,7 @@ pub trait Delta where Self: Into<LabValue> {
     /// let lch = LchValue::new(60.3, 89.2, 270.0).unwrap();
     /// let xyz = XyzValue::new(0.347, 0.912, 0.446).unwrap();
     /// let de  = lch.delta(xyz, DE1976);
-    /// assert_eq!(de, 188.93141);
+    /// assert_eq!(de, 180.18364);
     /// ```
     fn delta<L: Into<LabValue>>(self, other: L, method: DEMethod) -> DeltaE {
         let lab0: LabValue = self.into();
