@@ -1,6 +1,8 @@
 use super::*;
 
+/// Trait to validate whether a type has appropriate values
 pub trait Validate where Self: Sized {
+    /// Return `Err()` if the values are invalid
     fn validate(self) -> ValueResult<Self>;
 }
 
@@ -10,7 +12,7 @@ impl Validate for LabValue {
             self.a < -128.0 || self.a > 128.0 ||
             self.b < -128.0 || self.b > 128.0
         {
-            Err(Box::new(ValueError::OutOfBounds))
+            Err(ValueError::OutOfBounds)
         } else {
             Ok(self)
         }
@@ -23,7 +25,7 @@ impl Validate for LchValue {
             self.c < 0.0 || self.c > (128_f32.powi(2) + 128_f32.powi(2)).sqrt() ||
             self.h < 0.0 || self.h > 360.0
         {
-            Err(Box::new(ValueError::OutOfBounds))
+            Err(ValueError::OutOfBounds)
         } else {
             Ok(self)
         }
@@ -36,7 +38,7 @@ impl Validate for XyzValue {
         self.y < 0.0 || self.y > 1.0 ||
         self.z < 0.0 || self.z > 1.0
         {
-            Err(Box::new(ValueError::OutOfBounds))
+            Err(ValueError::OutOfBounds)
         } else {
             Ok(self)
         }

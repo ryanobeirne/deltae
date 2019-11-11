@@ -1,6 +1,5 @@
 use super::*;
 use std::convert::TryFrom;
-use std::error::Error;
 use std::str::FromStr;
 
 // To Lab /////////////////////////////////////////////////////////////////////
@@ -47,7 +46,7 @@ impl From<&XyzValue> for LabValue {
 }
 
 impl TryFrom<&[f32; 3]> for LabValue {
-    type Error = Box<dyn Error>;
+    type Error = ValueError;
     fn try_from(slice: &[f32; 3]) -> ValueResult<LabValue> {
         LabValue {
             l: slice[0],
@@ -58,7 +57,7 @@ impl TryFrom<&[f32; 3]> for LabValue {
 }
 
 impl TryFrom<(f32, f32, f32)> for LabValue {
-    type Error = Box<dyn Error>;
+    type Error = ValueError;
     fn try_from(tuple: (f32, f32, f32)) -> ValueResult<LabValue> {
         LabValue {
             l: tuple.0,
@@ -69,7 +68,7 @@ impl TryFrom<(f32, f32, f32)> for LabValue {
 }
 
 impl TryFrom<&(f32, f32, f32)> for LabValue {
-    type Error = Box<dyn Error>;
+    type Error = ValueError;
     fn try_from(tuple: &(f32, f32, f32)) -> ValueResult<LabValue> {
         LabValue {
             l: tuple.0,
@@ -115,7 +114,7 @@ impl From<&XyzValue> for LchValue {
 }
 
 impl TryFrom<&[f32; 3]> for LchValue {
-    type Error = Box<dyn Error>;
+    type Error = ValueError;
     fn try_from(slice: &[f32; 3]) -> ValueResult<LchValue> {
         LchValue {
             l: slice[0],
@@ -126,7 +125,7 @@ impl TryFrom<&[f32; 3]> for LchValue {
 }
 
 impl TryFrom<(f32, f32, f32)> for LchValue {
-    type Error = Box<dyn Error>;
+    type Error = ValueError;
     fn try_from(tuple: (f32, f32, f32)) -> ValueResult<LchValue> {
         LchValue {
             l: tuple.0,
@@ -137,7 +136,7 @@ impl TryFrom<(f32, f32, f32)> for LchValue {
 }
 
 impl TryFrom<&(f32, f32, f32)> for LchValue {
-    type Error = Box<dyn Error>;
+    type Error = ValueError;
     fn try_from(tuple: &(f32, f32, f32)) -> ValueResult<LchValue> {
         LchValue {
             l: tuple.0,
@@ -202,7 +201,7 @@ impl From<&LchValue> for XyzValue {
 }
 
 impl TryFrom<&[f32; 3]> for XyzValue {
-    type Error = Box<dyn Error>;
+    type Error = ValueError;
     fn try_from(slice: &[f32; 3]) -> ValueResult<XyzValue> {
         XyzValue {
             x: slice[0],
@@ -213,7 +212,7 @@ impl TryFrom<&[f32; 3]> for XyzValue {
 }
 
 impl TryFrom<(f32, f32, f32)> for XyzValue {
-    type Error = Box<dyn Error>;
+    type Error = ValueError;
     fn try_from(tuple: (f32, f32, f32)) -> ValueResult<XyzValue> {
         XyzValue {
             x: tuple.0,
@@ -224,7 +223,7 @@ impl TryFrom<(f32, f32, f32)> for XyzValue {
 }
 
 impl TryFrom<&(f32, f32, f32)> for XyzValue {
-    type Error = Box<dyn Error>;
+    type Error = ValueError;
     fn try_from(tuple: &(f32, f32, f32)) -> ValueResult<XyzValue> {
         XyzValue {
             x: tuple.0,
@@ -242,8 +241,8 @@ impl FromStr for DEMethod {
             "de2000"  | "de00"  | "2000"  | "00"  => Ok(DEMethod::DE2000),
             "de1976"  | "de76"  | "1976"  | "76"  => Ok(DEMethod::DE1976),
             "de1994"  | "de94"  | "1994"  | "94" |
-            "de1994g" | "de94g" | "1994g" | "94g" => Ok(DEMethod::DE1994(false)),
-            "de1994t" | "de94t" | "1994t" | "94t" => Ok(DEMethod::DE1994(true)),
+            "de1994g" | "de94g" | "1994g" | "94g" => Ok(DEMethod::DE1994G),
+            "de1994t" | "de94t" | "1994t" | "94t" => Ok(DEMethod::DE1994T),
             "decmc"   | "decmc1"| "cmc1"  | "cmc" => Ok(DEMethod::DECMC(1.0, 1.0)),
             "decmc2"  | "cmc2"                    => Ok(DEMethod::DECMC(2.0, 1.0)),
             _ => Err(io::Error::from(io::ErrorKind::InvalidInput)),
@@ -252,7 +251,7 @@ impl FromStr for DEMethod {
 }
 
 impl FromStr for LabValue {
-    type Err = Box<dyn Error>;
+    type Err = ValueError;
     fn from_str(s: &str) -> ValueResult<LabValue> {
         let split = parse_str_to_vecf32(s, 3)?;
 
@@ -265,7 +264,7 @@ impl FromStr for LabValue {
 }
 
 impl FromStr for LchValue {
-    type Err = Box<dyn Error>;
+    type Err = ValueError;
     fn from_str(s: &str) -> ValueResult<LchValue> {
         let split = parse_str_to_vecf32(s, 3)?;
 
@@ -278,7 +277,7 @@ impl FromStr for LchValue {
 }
 
 impl FromStr for XyzValue {
-    type Err = Box<dyn Error>;
+    type Err = ValueError;
     fn from_str(s: &str) -> ValueResult<XyzValue> {
         let split = parse_str_to_vecf32(s, 3)?;
 
@@ -317,7 +316,7 @@ fn parse_str_to_vecf32(s: &str, length: usize) -> ValueResult<Vec<f32>> {
 
     // Check if it's the right number of items
     if v.len() != length || split.len() != length {
-        return Err(Box::new(ValueError::BadFormat));
+        return Err(ValueError::BadFormat);
     }
 
     Ok(split)

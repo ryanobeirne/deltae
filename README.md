@@ -2,7 +2,9 @@
 
 ## Library
 
-A rust library for interacting with and manipulating Lab and Lch colors and calculating DeltaE (color difference).
+A rust library for converting colors and calculating
+[DeltaE](http://www.colorwiki.com/wiki/Delta_E:_The_Color_Difference) (color
+difference).
 
 Check out the documentation here:
 [Rust API Documentation](https://ryanobeirne.github.io/deltae)
@@ -16,38 +18,37 @@ cargo doc --open
 ### Examples
 
 ```rust
-extern crate deltae;
-use deltae::{DeltaE, DEMethod::DE2000};
-use deltae::color::LabValue;
+use std::error::Error;
+use std::str::FromStr;
+use deltae::*;
 
-fn main() {
-    let lab0 = LabValue::from("89.73, 1.88, -6.96").unwrap();
+fn main() -> Result<(), Box<dyn Error>>{
+    let lab0 = LabValue::from_str("89.73, 1.88, -6.96").unwrap();
     let lab1 = LabValue {
         l: 95.08,
         a: -0.17,
         b: -10.81,
-    };
+    }.validate()?;
 
-    println!("{}", lab0); // [L:89.73, a:1.88, b:-6.96]
+    println!("{}", &lab0); // [L:89.73, a:1.88, b:-6.96]
 
     let de0 = DeltaE::new(&lab0, &lab1, DE2000).round_to(4);
 
     println!("{}: {}", de0.method, de0.value); // DE2000: 5.3169
 
-    let de1 = DeltaE::from(
-        "89.73, 1.88, -6.96",
-        "95.08, -0.17, -10.81",
-        "DE2000"
-    ).unwrap();
+    let lch0 = LchValue::from(lab0);
+    println!("{}", lch0.round_to(4)); // [L:89.73, c:7.2094, h:285.1157]
+    let lab2 = LabValue::from(lch0);
+    println!("{}", lab0.round_to(4)); // [L:89.73, c:1.88, h:-6.96]
+    assert_eq!(lch0, lab2);
 
+    let de1 = lch0.delta(lab1, DE2000);
     assert_eq!(de0, de1.round_to(4));
 
-    let lch0 = lab0.to_lch();
-    let lab2 = lch0.to_lab();
-
-    println!("{}", lch0); // [L:89.73, c:7.2094, h:285.1157]
 
     assert_eq!(lab0.round_to(4), lab2.round_to(4));
+
+    Ok(())
 }
 ```
 
@@ -55,12 +56,31 @@ fn main() {
 
 ## Binary
 
-The binary included with this library is a command line application that calculates Delta E between to Lab colors.
+The binary included with this library is a command line application that
+calculates Delta E between to Lab colors.
 
 ### Usage
 
-```sh
-deltae [--method=<DE Method>] <L,a,b,> <L,a,b>
+```txt
+deltae 0.2.0
+Ryan O'Beirne <ryanobeirne@gmail.com>
+Calculate Delta E between two colors in CIE Lab space.
+
+USAGE:
+    deltae [OPTIONS] <COLOR0> <COLOR1>
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+OPTIONS:
+    -c, --color-type <COLORTYPE>    Set color type [default: lab]  [possible values: lab, lch, xyz]
+    -m, --method <METHOD>           Set DeltaE method [default: 2000]  [possible values: 2000, 1994, 1994T, CMC1, CMC2,
+                                    1976]
+
+ARGS:
+    <COLOR0>    Reference color values
+    <COLOR1>    Sample color values
 ```
 
 ### Example
@@ -79,4 +99,5 @@ cargo install --example=deltae --path=. --force
 
 ### Notes
 
-Calculates DE2000, DE1994 (Graphic Arts and Textiles), DECMC(1:1), DECMC(2:1), and DE1976. The Default is DE2000.
+Calculates DE2000, DE1994 (Graphic Arts and Textiles), DECMC (with a tolerance
+for lightness and chroma), and DE1976. The Default is DE2000.

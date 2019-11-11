@@ -1,6 +1,8 @@
 use super::*;
 
+/// Trait for rounding values to a number of decimal places
 pub trait Round {
+    /// Rounds the value to a number of decimal places
     fn round_to(self, places: i32) -> Self;
 }
 

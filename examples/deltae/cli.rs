@@ -9,7 +9,7 @@ pub fn app() -> App<'static, 'static> {
             .help("Set DeltaE method")
             .long("method")
             .short("m")
-            .possible_values(&["2000", "CMC1", "CMC2", "1994", "1994T", "1976"])
+            .possible_values(&["2000", "1994", "1994T", "CMC1", "CMC2", "1976"])
             .case_insensitive(true)
             .default_value("2000")
             .takes_value(true))

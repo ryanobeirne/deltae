@@ -14,5 +14,9 @@ readme = "README.md"
 name = "deltae"
 path = "examples/deltae/deltae.rs"
 
+[[example]]
+name = "readme"
+path = "examples/readme.rs"
+
 [dev-dependencies]
 clap = "2.32.0"

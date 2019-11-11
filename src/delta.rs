@@ -1,12 +1,24 @@
 use super::*;
 
+/// Trait to determine color difference between various types.
+/// As long as the type can be converted to Lab, we can calculate DeltaE.
 pub trait Delta where Self: Into<LabValue> {
+    /// Calculate DeltaE between 2 types
+    /// ```
+    /// use deltae::*;
+    ///
+    /// let lch = LchValue::new(60.3, 89.2, 270.0).unwrap();
+    /// let xyz = XyzValue::new(0.347, 0.912, 0.446).unwrap();
+    /// let de  = lch.delta(xyz, DE1976);
+    /// assert_eq!(de, 188.93141);
+    /// ```
     fn delta<L: Into<LabValue>>(self, other: L, method: DEMethod) -> DeltaE {
         let lab0: LabValue = self.into();
         let lab1: LabValue = other.into();
         let value = match method {
             DEMethod::DE1976 => delta_e_1976(&lab0, &lab1),
-            DEMethod::DE1994(textiles) => delta_e_1994(&lab0, &lab1, textiles),
+            DEMethod::DE1994T => delta_e_1994(&lab0, &lab1, true),
+            DEMethod::DE1994G => delta_e_1994(&lab0, &lab1, false),
             DEMethod::DE2000 => delta_e_2000(&lab0, &lab1),
             DEMethod::DECMC(t_l, t_c) => delta_e_cmc(&lab0, &lab1, t_l, t_c),
         };
@@ -18,11 +30,13 @@ pub trait Delta where Self: Into<LabValue> {
 impl<T: Into<LabValue>> Delta for T {}
 
 /// DeltaE 1976. Basic euclidian distance formula.
+#[inline]
 fn delta_e_1976(lab_0: &LabValue, lab_1: &LabValue) -> f32 {
     ( (lab_0.l - lab_1.l).powi(2) + (lab_0.a - lab_1.a).powi(2) + (lab_0.b - lab_1.b).powi(2) ).sqrt()
 }
 
 /// DeltaE 1994. Weighted for textiles (`true`) or graphics (`false`)
+#[inline]
 fn delta_e_1994(lab_0: &LabValue, lab_1: &LabValue, textiles: bool) -> f32 {
     let delta_l = lab_0.l - lab_1.l;
     let chroma_0 = (lab_0.a.powi(2) + lab_0.b.powi(2)).sqrt();
@@ -48,6 +62,7 @@ fn delta_e_1994(lab_0: &LabValue, lab_1: &LabValue, textiles: bool) -> f32 {
 }
 
 /// DeltaE 2000. This is a ridiculously complicated formula.
+#[inline]
 fn delta_e_2000(lab_0: &LabValue, lab_1: &LabValue) -> f32 {
     let chroma_0 = (lab_0.a.powi(2) + lab_0.b.powi(2)).sqrt();
     let chroma_1 = (lab_1.a.powi(2) + lab_1.b.powi(2)).sqrt();
@@ -120,6 +135,7 @@ fn delta_e_2000(lab_0: &LabValue, lab_1: &LabValue) -> f32 {
 }
 
 /// Custom weighted DeltaE formula
+#[inline]
 fn delta_e_cmc(lab0: &LabValue, lab1 :&LabValue, tolerance_l: f32, tolerance_c: f32) -> f32 {
     let chroma_0 = (lab0.a.powi(2) + lab0.b.powi(2)).sqrt();
     let chroma_1 = (lab1.a.powi(2) + lab1.b.powi(2)).sqrt();

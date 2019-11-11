@@ -28,10 +28,11 @@
 //! }
 //! ```
 
-use super::validate::*;
 use std::fmt;
 use std::error::Error;
-use std::convert::TryFrom;
+
+use crate::ValueResult;
+use crate::validate::Validate;
 
 /// # CIEL\*a\*b\*
 ///
@@ -43,13 +44,17 @@ use std::convert::TryFrom;
 ///
 #[derive(Debug, Clone, Copy)]
 pub struct LabValue {
+    /// Lightness
     pub l: f32,
+    /// Green - Magenta
     pub a: f32,
+    /// Blue - Yellow
     pub b: f32,
 }
 
 impl LabValue {
-    /// New `LabValue` from 3 `f32`s
+    /// Returns a result of a LabValue from 3 `f32`s.
+    /// Will return `Err()` if the values are out of range
     pub fn new(l: f32, a: f32, b: f32) -> ValueResult<LabValue> {
         LabValue {l, a, b}.validate()
     }
@@ -77,26 +82,22 @@ impl fmt::Display for LabValue {
 ///
 #[derive(Debug, Clone, Copy)]
 pub struct LchValue {
+    /// Lightness
     pub l: f32,
+    /// Chroma
     pub c: f32,
+    /// Hue (in degrees)
     pub h: f32,
 }
 
 impl LchValue {
+    /// Returns a result of an LchValue from 3 `f32`s.
+    /// Will return `Err()` if the values are out of range
     pub fn new(l: f32, c: f32, h: f32) -> ValueResult<LchValue> {
-        LchValue::try_from(&[l, c, h])
+        LchValue { l, c, h }.validate()
     }
 
-    /// Returns an array of [L, c, h]
-    pub fn to_a(&self) -> [f32; 3] {
-        [self.l, self.c, self.h]
-    }
-
-    /// Returns a `Vec<f32>` of [L, c, h]
-    pub fn to_vec(&self) -> Vec<f32> {
-        vec![self.l, self.c, self.h]
-    }
-
+    /// Returns the Hue as radians rather than degrees
     pub fn hue_radians(&self) -> f32 {
         self.h.to_radians()
     }
@@ -124,12 +125,17 @@ impl fmt::Display for LchValue {
 ///
 #[derive(Debug, Clone, Copy)]
 pub struct XyzValue {
+    /// X Value
     pub x: f32,
+    /// Y Value
     pub y: f32,
+    /// Z Value
     pub z: f32,
 }
 
 impl XyzValue {
+    /// Returns a result of an XyzValue from 3 `f32`s.
+    /// Will return `Err()` if the values are out of range
     pub fn new(x: f32, y: f32, z:f32) -> ValueResult<XyzValue> {
         XyzValue {x, y, z}.validate()
     }
@@ -148,12 +154,13 @@ impl fmt::Display for XyzValue {
 }
 
 #[derive(Debug)]
+/// Value validation Error type
 pub enum ValueError {
+    /// The value is outside the acceptable range
     OutOfBounds,
+    /// The value is formatted incorrectly
     BadFormat,
 }
-
-pub type ValueResult<T> = Result<T, Box<dyn Error>>;
 
 impl fmt::Display for ValueError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
