@@ -23,30 +23,43 @@ use std::str::FromStr;
 use deltae::*;
 
 fn main() -> Result<(), Box<dyn Error>>{
-    let lab0 = LabValue::from_str("89.73, 1.88, -6.96").unwrap();
+    // Lab from a string
+    let lab0 = LabValue::from_str("89.73, 1.88, -6.96")?;
+    // Lab directly from values
     let lab1 = LabValue {
         l: 95.08,
         a: -0.17,
         b: -10.81,
-    }.validate()?;
+    }.validate()?; // Validate that the values are in range
 
-    println!("{}", &lab0); // [L:89.73, a:1.88, b:-6.96]
+    // Calculate DeltaE between two lab values
+    let de0 = DeltaE::new(&lab0, &lab1, DE2000);
+    // Use the Delta trait
+    let de1 = lab0.delta(lab1, DE2000);
+    assert_eq!(de0, de1);
 
-    let de0 = DeltaE::new(&lab0, &lab1, DE2000).round_to(4);
-
-    println!("{}: {}", de0.method, de0.value); // DE2000: 5.3169
-
+    // Convert to other color types
     let lch0 = LchValue::from(lab0);
-    println!("{}", lch0.round_to(4)); // [L:89.73, c:7.2094, h:285.1157]
-    let lab2 = LabValue::from(lch0);
-    println!("{}", lab0.round_to(4)); // [L:89.73, c:1.88, h:-6.96]
-    assert_eq!(lch0, lab2);
+    let xyz0 = XyzValue::from(lab1);
+    // If DE2000 is less than 1.0, the colors are considered equivalent
+    assert_eq!(lch0, lab0);
+    assert_eq!(xyz0, lab1);
 
-    let de1 = lch0.delta(lab1, DE2000);
-    assert_eq!(de0, de1.round_to(4));
+    // Calculate DeltaE between different color types
+    let de2 = lch0.delta(xyz0, DE2000);
+    assert_eq!(de2.round_to(4), de0.round_to(4));
+    // There is some loss of accuracy in the conversion.
+    // Usually rounding to 4 decimal places is more than enough.
 
-
-    assert_eq!(lab0.round_to(4), lab2.round_to(4));
+    println!("{}\n{}\n{}\n{}\n{}\n{}\n{}\n",
+        lab0, // [L:89.73, a:1.88, b:-6.96]
+        lab1, // [L:95.08, a:-0.17, b:-10.81]
+        lch0, // [L:89.73, c:7.2094383, h:285.11572]
+        xyz0, // [X:0.84574246, Y:0.8780792, Z:0.8542397]
+        de0,  // 5.316941
+        de1,  // 5.316941
+        de2,  // 5.316937
+    );
 
     Ok(())
 }
@@ -62,7 +75,7 @@ calculates Delta E between to Lab colors.
 ### Usage
 
 ```txt
-deltae 0.2.0
+deltae 0.2.1
 Ryan O'Beirne <ryanobeirne@gmail.com>
 Calculate Delta E between two colors in CIE Lab space.
 
