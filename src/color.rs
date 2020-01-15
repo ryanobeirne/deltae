@@ -4,18 +4,17 @@
 //!
 //! ```
 //! use deltae::*;
-//! use std::str::FromStr;
 //! use std::error::Error;
 //!
 //! fn main() -> Result<(), Box<dyn Error>> {
-//!     let lab0 = LabValue::from_str("95.08, -0.17, -10.81")?;
+//!     let lab0: LabValue = "95.08, -0.17, -10.81".parse()?;
 //!     let lch0 = LchValue {
 //!         l: 95.08,
 //!         c: 10.811337,
 //!         h: 269.09903,
 //!     };
 //!
-//!     assert_eq!(lab0, lch0);
+//!     assert!(lab0.in_tolerance(lch0, &Tolerance::default()));
 //!
 //!     let lch0 = LchValue::from(lab0);
 //!     let lab2 = LabValue::from(lch0);
@@ -42,7 +41,7 @@ use crate::validate::Validate;
 /// | `a*`    | `Green <---> Magenta` | `-128 <---> 128` |
 /// | `b*`    | `Blue  <---> Yellow`  | `-128 <---> 128` |
 ///
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct LabValue {
     /// Lightness
     pub l: f32,
@@ -80,7 +79,7 @@ impl fmt::Display for LabValue {
 /// | `c`     | `Chroma (Amount of color)` | `0 <---> 181.0139` |
 /// | `h`     | `Hue (Degrees)`            | `0 <---> 360°`     |
 ///
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct LchValue {
     /// Lightness
     pub l: f32,
@@ -123,7 +122,7 @@ impl fmt::Display for LchValue {
 /// | `Y`     | `Green` | `0 <---> 1` |
 /// | `Z`     | `Blue`  | `0 <---> 1` |
 ///
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct XyzValue {
     /// X Value
     pub x: f32,
@@ -150,6 +149,43 @@ impl Default for XyzValue {
 impl fmt::Display for XyzValue {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "[X:{}, Y:{}, Z:{}]", self.x, self.y, self.z)
+    }
+}
+
+/// # RGB: Red, Green, Blue
+///
+/// | `Value` | `Color` | `Range`       |
+/// |:-------:|:-------:|:-------------:|
+/// | `R`     | `Red`   | `0 <---> 255` |
+/// | `G`     | `Green` | `0 <---> 255` |
+/// | `B`     | `Blue`  | `0 <---> 255` |
+///
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct RgbValue {
+    /// Red
+    pub r: u8,
+    /// Green
+    pub g: u8,
+    /// Blue
+    pub b: u8,
+}
+
+impl RgbValue {
+    /// Construct a new `RgbValue` from 3 `u8`s
+    pub fn new(r: u8, g: u8, b: u8) -> Self {
+        RgbValue { r, g, b }
+    }
+}
+
+impl Default for RgbValue {
+    fn default() -> RgbValue {
+        RgbValue { r: 0, g: 0, b: 0 }
+    }
+}
+
+impl fmt::Display for RgbValue {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "[R:{}, G:{}, B:{}]", self.r, self.g, self.b)
     }
 }
 

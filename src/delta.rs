@@ -1,4 +1,4 @@
-use super::*;
+use crate::*;
 
 /// Trait to determine color difference between various types.
 /// As long as the type can be converted to Lab, we can calculate DeltaE.
@@ -9,10 +9,10 @@ pub trait Delta where Self: Into<LabValue> {
     ///
     /// let lch = LchValue::new(60.3, 89.2, 270.0).unwrap();
     /// let xyz = XyzValue::new(0.347, 0.912, 0.446).unwrap();
-    /// let de  = lch.delta(xyz, DE1976);
-    /// assert_eq!(de, 180.18364);
+    /// let de  = lch.delta(xyz, &DE1976);
+    /// assert_eq!(de, 180.19023);
     /// ```
-    fn delta<L: Into<LabValue>>(self, other: L, method: DEMethod) -> DeltaE {
+    fn delta<L: Into<LabValue>>(self, other: L, method: &DEMethod) -> DeltaE {
         let lab0: LabValue = self.into();
         let lab1: LabValue = other.into();
         let value = match method {
@@ -23,7 +23,7 @@ pub trait Delta where Self: Into<LabValue> {
             DEMethod::DECMC(t_l, t_c) => delta_e_cmc(&lab0, &lab1, t_l, t_c),
         };
 
-        DeltaE { value, method }
+        DeltaE { value, method: *method }
     }
 }
 
@@ -136,7 +136,7 @@ fn delta_e_2000(lab_0: &LabValue, lab_1: &LabValue) -> f32 {
 
 /// Custom weighted DeltaE formula
 #[inline]
-fn delta_e_cmc(lab0: &LabValue, lab1 :&LabValue, tolerance_l: f32, tolerance_c: f32) -> f32 {
+fn delta_e_cmc(lab0: &LabValue, lab1 :&LabValue, tolerance_l: &f32, tolerance_c: &f32) -> f32 {
     let chroma_0 = (lab0.a.powi(2) + lab0.b.powi(2)).sqrt();
     let chroma_1 = (lab1.a.powi(2) + lab1.b.powi(2)).sqrt();
     let delta_c = chroma_0 - chroma_1;

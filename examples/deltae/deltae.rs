@@ -1,6 +1,5 @@
 use deltae::*;
 use std::error::Error;
-use std::str::FromStr;
 
 mod cli;
 
@@ -8,15 +7,15 @@ fn main() -> Result<(), Box<dyn Error>> {
     //Parse command line arguments with clap
     let matches = cli::app().get_matches();
 
-    let method = DEMethod::from_str(matches.value_of("METHOD").unwrap())?;
-    let color_type = matches.value_of("COLORTYPE").unwrap();
-    let color0 = matches.value_of("COLOR0").unwrap();
-    let color1 = matches.value_of("COLOR1").unwrap();
+    let method: DEMethod = matches.value_of("METHOD").expect("No default METHOD").parse()?;
+    let color_type = matches.value_of("COLORTYPE").expect("No default COLORTYPE");
+    let color0 = matches.value_of("COLOR0").expect("COLOR0 required");
+    let color1 = matches.value_of("COLOR1").expect("COLOR1 required");
 
     let delta = match color_type {
-        "lab" => LabValue::from_str(color0)?.delta(LabValue::from_str(color1)?, method),
-        "lch" => LchValue::from_str(color0)?.delta(LchValue::from_str(color1)?, method),
-        "xyz" => XyzValue::from_str(color0)?.delta(XyzValue::from_str(color1)?, method),
+        "lab" => color0.parse::<LabValue>()?.delta(color1.parse::<LabValue>()?, &method),
+        "lch" => color0.parse::<LchValue>()?.delta(color1.parse::<LchValue>()?, &method),
+        "xyz" => color0.parse::<XyzValue>()?.delta(color1.parse::<XyzValue>()?, &method),
         _ => unreachable!("COLORTYPE"),
     };
 

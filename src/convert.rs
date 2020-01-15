@@ -1,4 +1,5 @@
-use super::*;
+use crate::*;
+use illuminant::D50;
 use std::convert::TryFrom;
 use std::str::FromStr;
 
@@ -27,9 +28,9 @@ impl From<&LabValue> for LabValue {
 
 impl From<XyzValue> for LabValue {
     fn from(xyz: XyzValue) -> LabValue {
-        let x = xyz_to_lab_map(xyz.x / 0.9642);
-        let y = xyz_to_lab_map(xyz.y);
-        let z = xyz_to_lab_map(xyz.z / 0.8251);
+        let x = xyz_to_lab_map(xyz.x / D50.x);
+        let y = xyz_to_lab_map(xyz.y / D50.y);
+        let z = xyz_to_lab_map(xyz.z / D50.z);
 
         LabValue {
             l: (116.0 * y) - 16.0,
@@ -169,9 +170,9 @@ impl From<LabValue> for XyzValue {
         };
 
         XyzValue {
-            x: xr * 0.9642,
-            y: yr,
-            z: zr * 0.8251,
+            x: xr * D50.x,
+            y: yr * D50.y,
+            z: zr * D50.z,
         }
     }
 }
@@ -230,6 +231,19 @@ impl TryFrom<&(f32, f32, f32)> for XyzValue {
             y: tuple.1,
             z: tuple.2,
         }.validate()
+    }
+}
+
+// To RGB
+impl From<LabValue> for RgbValue {
+    fn from(lab: LabValue) -> Self {
+        todo!()
+    }
+}
+
+impl From<&LabValue> for RgbValue {
+    fn from(lab: &LabValue) -> Self {
+        todo!()
     }
 }
 

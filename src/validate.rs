@@ -32,6 +32,7 @@ impl Validate for LchValue {
     }
 }
 
+/// Not sure about the bounds on XYZ
 impl Validate for XyzValue {
     fn validate(self) -> ValueResult<Self> {
         if self.x < 0.0 || self.x > 1.0 ||

@@ -139,7 +139,7 @@ fn compare_de(method: DEMethod, expected: f32, reference: &[f32; 3], sample: &[f
     let lab0 = LabValue::try_from(reference)?;
     let lab1 = LabValue::try_from(sample)?;
 
-    let de = lab0.delta(lab1, method).round_to(4).value;
+    let de = lab0.delta(lab1, &method).round_to(4).value;
 
     assert_eq!(expected, de);
 

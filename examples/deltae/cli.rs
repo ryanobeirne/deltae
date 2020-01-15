@@ -25,5 +25,5 @@ pub fn app() -> App<'static, 'static> {
             .long("color-type")
             .aliases(&["color", "type"])
             .default_value("lab")
-            .possible_values(&["lab", "lch", "xyz"]))
+            .possible_values(&["lab", "lch", "xyz", "rgb"]))
 }
