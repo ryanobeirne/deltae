@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/convert.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>convert.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../deltae/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/convert.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>convert.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../deltae/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -323,26 +325,14 @@
 <span id="323">323</span>
 <span id="324">324</span>
 <span id="325">325</span>
-<span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
-<span id="332">332</span>
-<span id="333">333</span>
-<span id="334">334</span>
-<span id="335">335</span>
-<span id="336">336</span>
-<span id="337">337</span>
-</pre><div class="example-wrap"><pre class="rust ">
+</pre><pre class="rust">
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">convert</span>::<span class="ident">TryFrom</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
+<span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
+<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
 
 <span class="comment">// To Lab /////////////////////////////////////////////////////////////////////</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">LchValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LabValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lch</span>: <span class="ident">LchValue</span>) <span class="op">-&gt;</span> <span class="ident">LabValue</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lch</span>: <span class="ident">LchValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LabValue</span> {
         <span class="ident">LabValue</span> {
             <span class="ident">l</span>: <span class="ident">lch</span>.<span class="ident">l</span>,
             <span class="ident">a</span>: <span class="ident">lch</span>.<span class="ident">c</span> <span class="op">*</span> <span class="ident">lch</span>.<span class="ident">h</span>.<span class="ident">to_radians</span>().<span class="ident">cos</span>(),
@@ -352,19 +342,19 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">LchValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LabValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lch</span>: <span class="kw-2">&amp;</span><span class="ident">LchValue</span>) <span class="op">-&gt;</span> <span class="ident">LabValue</span> {
-        <span class="ident">LabValue</span>::<span class="ident">from</span>(<span class="kw-2">*</span><span class="ident">lch</span>)
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lch</span>: <span class="kw-2">&amp;</span><span class="ident">LchValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LabValue</span> {
+        <span class="ident">LabValue::from</span>(<span class="kw-2">*</span><span class="ident">lch</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">LabValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LabValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lab</span>: <span class="kw-2">&amp;</span><span class="ident">LabValue</span>) <span class="op">-&gt;</span> <span class="ident">LabValue</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lab</span>: <span class="kw-2">&amp;</span><span class="ident">LabValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LabValue</span> {
         <span class="kw-2">*</span><span class="ident">lab</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">XyzValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LabValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">xyz</span>: <span class="ident">XyzValue</span>) <span class="op">-&gt;</span> <span class="ident">LabValue</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">xyz</span>: <span class="ident">XyzValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LabValue</span> {
         <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">xyz_to_lab_map</span>(<span class="ident">xyz</span>.<span class="ident">x</span> <span class="op">/</span> <span class="number">0.9642</span>);
         <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">xyz_to_lab_map</span>(<span class="ident">xyz</span>.<span class="ident">y</span>);
         <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">xyz_to_lab_map</span>(<span class="ident">xyz</span>.<span class="ident">z</span> <span class="op">/</span> <span class="number">0.8251</span>);
@@ -378,14 +368,14 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">XyzValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LabValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">xyz</span>: <span class="kw-2">&amp;</span><span class="ident">XyzValue</span>) <span class="op">-&gt;</span> <span class="ident">LabValue</span> {
-        <span class="ident">LabValue</span>::<span class="ident">from</span>(<span class="kw-2">*</span><span class="ident">xyz</span>)
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">xyz</span>: <span class="kw-2">&amp;</span><span class="ident">XyzValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LabValue</span> {
+        <span class="ident">LabValue::from</span>(<span class="kw-2">*</span><span class="ident">xyz</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">f32</span>; <span class="number">3</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LabValue</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ValueError</span>;
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">f32</span>; <span class="number">3</span>]) <span class="op">-&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">LabValue</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">f32</span>; <span class="number">3</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">LabValue</span><span class="op">&gt;</span> {
         <span class="ident">LabValue</span> {
             <span class="ident">l</span>: <span class="ident">slice</span>[<span class="number">0</span>],
             <span class="ident">a</span>: <span class="ident">slice</span>[<span class="number">1</span>],
@@ -396,7 +386,7 @@
 
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span>(<span class="ident">f32</span>, <span class="ident">f32</span>, <span class="ident">f32</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LabValue</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ValueError</span>;
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">tuple</span>: (<span class="ident">f32</span>, <span class="ident">f32</span>, <span class="ident">f32</span>)) <span class="op">-&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">LabValue</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">tuple</span>: (<span class="ident">f32</span>, <span class="ident">f32</span>, <span class="ident">f32</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">LabValue</span><span class="op">&gt;</span> {
         <span class="ident">LabValue</span> {
             <span class="ident">l</span>: <span class="ident">tuple</span>.<span class="number">0</span>,
             <span class="ident">a</span>: <span class="ident">tuple</span>.<span class="number">1</span>,
@@ -407,7 +397,7 @@
 
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="ident">f32</span>, <span class="ident">f32</span>, <span class="ident">f32</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LabValue</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ValueError</span>;
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">tuple</span>: <span class="kw-2">&amp;</span>(<span class="ident">f32</span>, <span class="ident">f32</span>, <span class="ident">f32</span>)) <span class="op">-&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">LabValue</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">tuple</span>: <span class="kw-2">&amp;</span>(<span class="ident">f32</span>, <span class="ident">f32</span>, <span class="ident">f32</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">LabValue</span><span class="op">&gt;</span> {
         <span class="ident">LabValue</span> {
             <span class="ident">l</span>: <span class="ident">tuple</span>.<span class="number">0</span>,
             <span class="ident">a</span>: <span class="ident">tuple</span>.<span class="number">1</span>,
@@ -417,14 +407,8 @@
 }
 
 <span class="comment">// To Lch /////////////////////////////////////////////////////////////////////</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">LchValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LchValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lch</span>: <span class="kw-2">&amp;</span><span class="ident">LchValue</span>) <span class="op">-&gt;</span> <span class="ident">LchValue</span> {
-        <span class="ident">LchValue</span>::<span class="ident">from</span>(<span class="kw-2">*</span><span class="ident">lch</span>)
-    }
-}
-
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">LabValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LchValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lab</span>: <span class="ident">LabValue</span>) <span class="op">-&gt;</span> <span class="ident">LchValue</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lab</span>: <span class="ident">LabValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LchValue</span> {
         <span class="ident">LchValue</span> {
             <span class="ident">l</span>: <span class="ident">lab</span>.<span class="ident">l</span>,
             <span class="ident">c</span>: ( <span class="ident">lab</span>.<span class="ident">a</span>.<span class="ident">powi</span>(<span class="number">2</span>) <span class="op">+</span> <span class="ident">lab</span>.<span class="ident">b</span>.<span class="ident">powi</span>(<span class="number">2</span>) ).<span class="ident">sqrt</span>(),
@@ -434,26 +418,26 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">LabValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LchValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lab</span>: <span class="kw-2">&amp;</span><span class="ident">LabValue</span>) <span class="op">-&gt;</span> <span class="ident">LchValue</span> {
-        <span class="ident">LchValue</span>::<span class="ident">from</span>(<span class="kw-2">*</span><span class="ident">lab</span>)
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lab</span>: <span class="kw-2">&amp;</span><span class="ident">LabValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LchValue</span> {
+        <span class="ident">LchValue::from</span>(<span class="kw-2">*</span><span class="ident">lab</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">XyzValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LchValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">xyz</span>: <span class="ident">XyzValue</span>) <span class="op">-&gt;</span> <span class="ident">LchValue</span> {
-        <span class="ident">LchValue</span>::<span class="ident">from</span>(<span class="ident">LabValue</span>::<span class="ident">from</span>(<span class="ident">xyz</span>))
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">xyz</span>: <span class="ident">XyzValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LchValue</span> {
+        <span class="ident">LchValue::from</span>(<span class="ident">LabValue::from</span>(<span class="ident">xyz</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">XyzValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LchValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">xyz</span>: <span class="kw-2">&amp;</span><span class="ident">XyzValue</span>) <span class="op">-&gt;</span> <span class="ident">LchValue</span> {
-        <span class="ident">LchValue</span>::<span class="ident">from</span>(<span class="kw-2">*</span><span class="ident">xyz</span>)
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">xyz</span>: <span class="kw-2">&amp;</span><span class="ident">XyzValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LchValue</span> {
+        <span class="ident">LchValue::from</span>(<span class="kw-2">*</span><span class="ident">xyz</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">f32</span>; <span class="number">3</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LchValue</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ValueError</span>;
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">f32</span>; <span class="number">3</span>]) <span class="op">-&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">LchValue</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">f32</span>; <span class="number">3</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">LchValue</span><span class="op">&gt;</span> {
         <span class="ident">LchValue</span> {
             <span class="ident">l</span>: <span class="ident">slice</span>[<span class="number">0</span>],
             <span class="ident">c</span>: <span class="ident">slice</span>[<span class="number">1</span>],
@@ -464,7 +448,7 @@
 
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span>(<span class="ident">f32</span>, <span class="ident">f32</span>, <span class="ident">f32</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LchValue</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ValueError</span>;
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">tuple</span>: (<span class="ident">f32</span>, <span class="ident">f32</span>, <span class="ident">f32</span>)) <span class="op">-&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">LchValue</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">tuple</span>: (<span class="ident">f32</span>, <span class="ident">f32</span>, <span class="ident">f32</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">LchValue</span><span class="op">&gt;</span> {
         <span class="ident">LchValue</span> {
             <span class="ident">l</span>: <span class="ident">tuple</span>.<span class="number">0</span>,
             <span class="ident">c</span>: <span class="ident">tuple</span>.<span class="number">1</span>,
@@ -475,7 +459,7 @@
 
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="ident">f32</span>, <span class="ident">f32</span>, <span class="ident">f32</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LchValue</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ValueError</span>;
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">tuple</span>: <span class="kw-2">&amp;</span>(<span class="ident">f32</span>, <span class="ident">f32</span>, <span class="ident">f32</span>)) <span class="op">-&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">LchValue</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">tuple</span>: <span class="kw-2">&amp;</span>(<span class="ident">f32</span>, <span class="ident">f32</span>, <span class="ident">f32</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">LchValue</span><span class="op">&gt;</span> {
         <span class="ident">LchValue</span> {
             <span class="ident">l</span>: <span class="ident">tuple</span>.<span class="number">0</span>,
             <span class="ident">c</span>: <span class="ident">tuple</span>.<span class="number">1</span>,
@@ -486,11 +470,11 @@
 
 <span class="comment">// To Xyz /////////////////////////////////////////////////////////////////////</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">LabValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">XyzValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lab</span>: <span class="ident">LabValue</span>) <span class="op">-&gt;</span> <span class="ident">XyzValue</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lab</span>: <span class="ident">LabValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">XyzValue</span> {
         <span class="kw">let</span> <span class="ident">fy</span> <span class="op">=</span> (<span class="ident">lab</span>.<span class="ident">l</span> <span class="op">+</span> <span class="number">16.0</span>) <span class="op">/</span> <span class="number">116.0</span>;
         <span class="kw">let</span> <span class="ident">fx</span> <span class="op">=</span> (<span class="ident">lab</span>.<span class="ident">a</span> <span class="op">/</span> <span class="number">500.0</span>) <span class="op">+</span> <span class="ident">fy</span>;
         <span class="kw">let</span> <span class="ident">fz</span> <span class="op">=</span> <span class="ident">fy</span> <span class="op">-</span> (<span class="ident">lab</span>.<span class="ident">b</span> <span class="op">/</span> <span class="number">200.0</span>);
-        <span class="kw">let</span> <span class="ident">xr</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">fx</span> <span class="op">&gt;</span> <span class="ident">CBRT_EPSILON</span> {
+        <span class="kw">let</span> <span class="ident">xr</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">fx</span> <span class="op">&gt;</span> <span class="ident">CBRT_EPSILON</span> <span class="kw">as</span> <span class="ident">f32</span> {
             <span class="ident">fx</span>.<span class="ident">powi</span>(<span class="number">3</span>)
         } <span class="kw">else</span> {
             ((<span class="ident">fx</span> <span class="op">*</span> <span class="number">116.0</span>) <span class="op">-</span> <span class="number">16.0</span>) <span class="op">/</span> <span class="ident">KAPPA</span>
@@ -500,7 +484,7 @@
         } <span class="kw">else</span> {
             <span class="ident">lab</span>.<span class="ident">l</span> <span class="op">/</span> <span class="ident">KAPPA</span>
         };
-        <span class="kw">let</span> <span class="ident">zr</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">fz</span> <span class="op">&gt;</span> <span class="ident">CBRT_EPSILON</span> {
+        <span class="kw">let</span> <span class="ident">zr</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">fz</span> <span class="op">&gt;</span> <span class="ident">CBRT_EPSILON</span> <span class="kw">as</span> <span class="ident">f32</span> {
             <span class="ident">fz</span>.<span class="ident">powi</span>(<span class="number">3</span>)
         } <span class="kw">else</span> {
             ((<span class="ident">fz</span> <span class="op">*</span> <span class="number">116.0</span>) <span class="op">-</span> <span class="number">16.0</span>) <span class="op">/</span> <span class="ident">KAPPA</span>
@@ -514,33 +498,27 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">XyzValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">XyzValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">xyz</span>: <span class="kw-2">&amp;</span><span class="ident">XyzValue</span>) <span class="op">-&gt;</span> <span class="ident">XyzValue</span> {
-        <span class="ident">XyzValue</span>::<span class="ident">from</span>(<span class="kw-2">*</span><span class="ident">xyz</span>)
-    }
-}
-
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">LabValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">XyzValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lab</span>: <span class="kw-2">&amp;</span><span class="ident">LabValue</span>) <span class="op">-&gt;</span> <span class="ident">XyzValue</span> {
-        <span class="ident">XyzValue</span>::<span class="ident">from</span>(<span class="kw-2">*</span><span class="ident">lab</span>)
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lab</span>: <span class="kw-2">&amp;</span><span class="ident">LabValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">XyzValue</span> {
+        <span class="ident">XyzValue::from</span>(<span class="kw-2">*</span><span class="ident">lab</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">LchValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">XyzValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lch</span>: <span class="ident">LchValue</span>) <span class="op">-&gt;</span> <span class="ident">XyzValue</span> {
-        <span class="ident">XyzValue</span>::<span class="ident">from</span>(<span class="ident">LabValue</span>::<span class="ident">from</span>(<span class="ident">lch</span>))
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lch</span>: <span class="ident">LchValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">XyzValue</span> {
+        <span class="ident">XyzValue::from</span>(<span class="ident">LabValue::from</span>(<span class="ident">lch</span>))
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">LchValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">XyzValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lch</span>: <span class="kw-2">&amp;</span><span class="ident">LchValue</span>) <span class="op">-&gt;</span> <span class="ident">XyzValue</span> {
-        <span class="ident">XyzValue</span>::<span class="ident">from</span>(<span class="kw-2">*</span><span class="ident">lch</span>)
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lch</span>: <span class="kw-2">&amp;</span><span class="ident">LchValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">XyzValue</span> {
+        <span class="ident">XyzValue::from</span>(<span class="kw-2">*</span><span class="ident">lch</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">f32</span>; <span class="number">3</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">XyzValue</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ValueError</span>;
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">f32</span>; <span class="number">3</span>]) <span class="op">-&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">XyzValue</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">f32</span>; <span class="number">3</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">XyzValue</span><span class="op">&gt;</span> {
         <span class="ident">XyzValue</span> {
             <span class="ident">x</span>: <span class="ident">slice</span>[<span class="number">0</span>],
             <span class="ident">y</span>: <span class="ident">slice</span>[<span class="number">1</span>],
@@ -551,7 +529,7 @@
 
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span>(<span class="ident">f32</span>, <span class="ident">f32</span>, <span class="ident">f32</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">XyzValue</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ValueError</span>;
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">tuple</span>: (<span class="ident">f32</span>, <span class="ident">f32</span>, <span class="ident">f32</span>)) <span class="op">-&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">XyzValue</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">tuple</span>: (<span class="ident">f32</span>, <span class="ident">f32</span>, <span class="ident">f32</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">XyzValue</span><span class="op">&gt;</span> {
         <span class="ident">XyzValue</span> {
             <span class="ident">x</span>: <span class="ident">tuple</span>.<span class="number">0</span>,
             <span class="ident">y</span>: <span class="ident">tuple</span>.<span class="number">1</span>,
@@ -562,7 +540,7 @@
 
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="ident">f32</span>, <span class="ident">f32</span>, <span class="ident">f32</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">XyzValue</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ValueError</span>;
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">tuple</span>: <span class="kw-2">&amp;</span>(<span class="ident">f32</span>, <span class="ident">f32</span>, <span class="ident">f32</span>)) <span class="op">-&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">XyzValue</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">tuple</span>: <span class="kw-2">&amp;</span>(<span class="ident">f32</span>, <span class="ident">f32</span>, <span class="ident">f32</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">XyzValue</span><span class="op">&gt;</span> {
         <span class="ident">XyzValue</span> {
             <span class="ident">x</span>: <span class="ident">tuple</span>.<span class="number">0</span>,
             <span class="ident">y</span>: <span class="ident">tuple</span>.<span class="number">1</span>,
@@ -573,24 +551,24 @@
 
 <span class="comment">// FromStr ////////////////////////////////////////////////////////////////////</span>
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">DEMethod</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Error</span>;
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DEMethod</span>, <span class="self">Self</span>::<span class="prelude-val">Err</span><span class="op">&gt;</span> {
+    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">std::io::Error</span>;
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DEMethod</span>, <span class="self">Self</span><span class="ident">::Err</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">to_lowercase</span>().<span class="ident">trim</span>() {
-            <span class="string">&quot;de2000&quot;</span>  <span class="op">|</span> <span class="string">&quot;de00&quot;</span>  <span class="op">|</span> <span class="string">&quot;2000&quot;</span>  <span class="op">|</span> <span class="string">&quot;00&quot;</span>  <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DEMethod</span>::<span class="ident">DE2000</span>),
-            <span class="string">&quot;de1976&quot;</span>  <span class="op">|</span> <span class="string">&quot;de76&quot;</span>  <span class="op">|</span> <span class="string">&quot;1976&quot;</span>  <span class="op">|</span> <span class="string">&quot;76&quot;</span>  <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DEMethod</span>::<span class="ident">DE1976</span>),
+            <span class="string">&quot;de2000&quot;</span>  <span class="op">|</span> <span class="string">&quot;de00&quot;</span>  <span class="op">|</span> <span class="string">&quot;2000&quot;</span>  <span class="op">|</span> <span class="string">&quot;00&quot;</span>  <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DEMethod::DE2000</span>),
+            <span class="string">&quot;de1976&quot;</span>  <span class="op">|</span> <span class="string">&quot;de76&quot;</span>  <span class="op">|</span> <span class="string">&quot;1976&quot;</span>  <span class="op">|</span> <span class="string">&quot;76&quot;</span>  <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DEMethod::DE1976</span>),
             <span class="string">&quot;de1994&quot;</span>  <span class="op">|</span> <span class="string">&quot;de94&quot;</span>  <span class="op">|</span> <span class="string">&quot;1994&quot;</span>  <span class="op">|</span> <span class="string">&quot;94&quot;</span> <span class="op">|</span>
-            <span class="string">&quot;de1994g&quot;</span> <span class="op">|</span> <span class="string">&quot;de94g&quot;</span> <span class="op">|</span> <span class="string">&quot;1994g&quot;</span> <span class="op">|</span> <span class="string">&quot;94g&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DEMethod</span>::<span class="ident">DE1994G</span>),
-            <span class="string">&quot;de1994t&quot;</span> <span class="op">|</span> <span class="string">&quot;de94t&quot;</span> <span class="op">|</span> <span class="string">&quot;1994t&quot;</span> <span class="op">|</span> <span class="string">&quot;94t&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DEMethod</span>::<span class="ident">DE1994T</span>),
-            <span class="string">&quot;decmc&quot;</span>   <span class="op">|</span> <span class="string">&quot;decmc1&quot;</span><span class="op">|</span> <span class="string">&quot;cmc1&quot;</span>  <span class="op">|</span> <span class="string">&quot;cmc&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DEMethod</span>::<span class="ident">DECMC</span>(<span class="number">1.0</span>, <span class="number">1.0</span>)),
-            <span class="string">&quot;decmc2&quot;</span>  <span class="op">|</span> <span class="string">&quot;cmc2&quot;</span>                    <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DEMethod</span>::<span class="ident">DECMC</span>(<span class="number">2.0</span>, <span class="number">1.0</span>)),
-            <span class="kw">_</span> <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">from</span>(<span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">InvalidInput</span>)),
+            <span class="string">&quot;de1994g&quot;</span> <span class="op">|</span> <span class="string">&quot;de94g&quot;</span> <span class="op">|</span> <span class="string">&quot;1994g&quot;</span> <span class="op">|</span> <span class="string">&quot;94g&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DEMethod::DE1994G</span>),
+            <span class="string">&quot;de1994t&quot;</span> <span class="op">|</span> <span class="string">&quot;de94t&quot;</span> <span class="op">|</span> <span class="string">&quot;1994t&quot;</span> <span class="op">|</span> <span class="string">&quot;94t&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DEMethod::DE1994T</span>),
+            <span class="string">&quot;decmc&quot;</span>   <span class="op">|</span> <span class="string">&quot;decmc1&quot;</span><span class="op">|</span> <span class="string">&quot;cmc1&quot;</span>  <span class="op">|</span> <span class="string">&quot;cmc&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DEMethod::DECMC</span>(<span class="number">1.0</span>, <span class="number">1.0</span>)),
+            <span class="string">&quot;decmc2&quot;</span>  <span class="op">|</span> <span class="string">&quot;cmc2&quot;</span>                    <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">DEMethod::DECMC</span>(<span class="number">2.0</span>, <span class="number">1.0</span>)),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::from</span>(<span class="ident">io::ErrorKind::InvalidInput</span>)),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">LabValue</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">ValueError</span>;
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">LabValue</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">LabValue</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">split</span> <span class="op">=</span> <span class="ident">parse_str_to_vecf32</span>(<span class="ident">s</span>, <span class="number">3</span>)<span class="question-mark">?</span>;
 
         <span class="ident">LabValue</span> {
@@ -603,7 +581,7 @@
 
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">LchValue</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">ValueError</span>;
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">LchValue</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">LchValue</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">split</span> <span class="op">=</span> <span class="ident">parse_str_to_vecf32</span>(<span class="ident">s</span>, <span class="number">3</span>)<span class="question-mark">?</span>;
 
         <span class="ident">LchValue</span> {
@@ -616,7 +594,7 @@
 
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">XyzValue</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">ValueError</span>;
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">XyzValue</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">XyzValue</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">split</span> <span class="op">=</span> <span class="ident">parse_str_to_vecf32</span>(<span class="ident">s</span>, <span class="number">3</span>)<span class="question-mark">?</span>;
 
         <span class="ident">XyzValue</span> {
@@ -631,9 +609,9 @@
 <span class="comment">// Helper Functions ////////////////////////////////////////////////////////////</span>
 <span class="kw">const</span> <span class="ident">KAPPA</span>: <span class="ident">f32</span> <span class="op">=</span> <span class="number">24389.0</span> <span class="op">/</span> <span class="number">27.0</span>; <span class="comment">// CIE Standard: 903.3</span>
 <span class="kw">const</span> <span class="ident">EPSILON</span>: <span class="ident">f32</span> <span class="op">=</span> <span class="number">216.0</span> <span class="op">/</span> <span class="number">24389.0</span>; <span class="comment">// CIE Standard: 0.008856</span>
-<span class="kw">const</span> <span class="ident">CBRT_EPSILON</span>: <span class="ident">f32</span> <span class="op">=</span> <span class="number">0.20689655172413796</span>;
+<span class="kw">const</span> <span class="ident">CBRT_EPSILON</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.20689655172413796</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_h_prime</span>(<span class="ident">a</span>: <span class="ident">f32</span>, <span class="ident">b</span>: <span class="ident">f32</span>) <span class="op">-&gt;</span> <span class="ident">f32</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_h_prime</span>(<span class="ident">a</span>: <span class="ident">f32</span>, <span class="ident">b</span>: <span class="ident">f32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f32</span> {
     <span class="kw">let</span> <span class="ident">h_prime</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">atan2</span>(<span class="ident">a</span>).<span class="ident">to_degrees</span>();
     <span class="kw">if</span> <span class="ident">h_prime</span> <span class="op">&lt;</span> <span class="number">0.0</span> {
         <span class="ident">h_prime</span> <span class="op">+</span> <span class="number">360.0</span>
@@ -644,11 +622,11 @@
 
 <span class="comment">// Validate and convert strings to `LabValue`.</span>
 <span class="comment">// Split string by comma (92.5,33.5,-18.8).</span>
-<span class="kw">fn</span> <span class="ident">parse_str_to_vecf32</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">length</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;&gt;</span> {
-    <span class="kw">let</span> <span class="ident">collection</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&quot;,&quot;</span>).<span class="ident">collect</span>();
+<span class="kw">fn</span> <span class="ident">parse_str_to_vecf32</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">length</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ValueResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">collection</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>).<span class="ident">collect</span>();
 
     <span class="comment">// Allow extraneous whitespace (&quot;92.5, 33.5, -18.8&quot;)</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
     <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">collection</span>.<span class="ident">iter</span>() {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">item</span>.<span class="ident">is_empty</span>() {
             <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">item</span>.<span class="ident">trim</span>());
@@ -658,15 +636,15 @@
     <span class="kw">let</span> <span class="ident">split</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()).<span class="ident">collect</span>();
 
     <span class="comment">// Check if it&#39;s the right number of items</span>
-    <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">len</span>() <span class="op">!=</span> <span class="ident">length</span> <span class="op">||</span> <span class="ident">split</span>.<span class="ident">len</span>() <span class="op">!=</span> <span class="ident">length</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ValueError</span>::<span class="ident">BadFormat</span>);
+    <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">length</span> <span class="op">|</span><span class="op">|</span> <span class="ident">split</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">length</span> {
+        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ValueError::BadFormat</span>);
     }
 
     <span class="prelude-val">Ok</span>(<span class="ident">split</span>)
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">xyz_to_lab_map</span>(<span class="ident">c</span>: <span class="ident">f32</span>) <span class="op">-&gt;</span> <span class="ident">f32</span> {
+<span class="kw">fn</span> <span class="ident">xyz_to_lab_map</span>(<span class="ident">c</span>: <span class="ident">f32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f32</span> {
     <span class="kw">if</span> <span class="ident">c</span> <span class="op">&gt;</span> <span class="ident">EPSILON</span> {
         <span class="ident">c</span>.<span class="ident">powf</span>(<span class="number">1.0</span><span class="op">/</span><span class="number">3.0</span>)
     } <span class="kw">else</span> {
@@ -674,4 +652,4 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "deltae";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="deltae" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>
