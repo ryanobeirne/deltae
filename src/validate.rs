@@ -6,41 +6,47 @@ pub trait Validate where Self: Sized {
     fn validate(self) -> ValueResult<Self>;
 }
 
+const RANGE_PCT: std::ops::RangeInclusive<f32> = 0.0..=100.0;
+const RANGE_I8: std::ops::RangeInclusive<f32> = -128.0..=128.0;
+const RANGE_CHROMA: std::ops::RangeInclusive<f32> = 0.0..=181.01933;
+const RANGE_360: std::ops::RangeInclusive<f32> = 0.0..=360.0;
+const RANGE_01: std::ops::RangeInclusive<f32> = 0.0..=1.0;
+
 impl Validate for LabValue {
     fn validate(self) -> ValueResult<Self> {
-        if self.l < 0.0    || self.l > 100.0 ||
-           self.a < -128.0 || self.a > 128.0 ||
-           self.b < -128.0 || self.b > 128.0
+        if RANGE_PCT.contains(&self.l)
+            && RANGE_I8.contains(&self.a)
+            && RANGE_I8.contains(&self.b)
         {
-            Err(ValueError::OutOfBounds)
-        } else {
             Ok(self)
+        } else {
+            Err(ValueError::OutOfBounds)
         }
     }
 }
 
 impl Validate for LchValue {
     fn validate(self) -> ValueResult<Self> {
-        if self.l < 0.0 || self.l > 100.0 ||
-           self.c < 0.0 || self.c > (128_f32.powi(2) + 128_f32.powi(2)).sqrt() ||
-           self.h < 0.0 || self.h > 360.0
+        if RANGE_PCT.contains(&self.l)
+            && RANGE_CHROMA.contains(&self.c)
+            && RANGE_360.contains(&self.h)
         {
-            Err(ValueError::OutOfBounds)
-        } else {
             Ok(self)
+        } else {
+            Err(ValueError::OutOfBounds)
         }
     }
 }
 
 impl Validate for XyzValue {
     fn validate(self) -> ValueResult<Self> {
-        if self.x < 0.0 || self.x > 1.0 ||
-           self.y < 0.0 || self.y > 1.0 ||
-           self.z < 0.0 || self.z > 1.0
+        if RANGE_01.contains(&self.x)
+            && RANGE_01.contains(&self.y)
+            && RANGE_01.contains(&self.z)
         {
-            Err(ValueError::OutOfBounds)
-        } else {
             Ok(self)
+        } else {
+            Err(ValueError::OutOfBounds)
         }
     }
 }

@@ -25,10 +25,11 @@
 use std::fmt;
 use std::error::Error;
 
-use crate::ValueResult;
-use crate::validate::Validate;
+use crate::*;
 
 /// # CIEL\*a\*b\*
+///
+/// The [`LabValue`] is the key component in calculating [`DeltaE`]
 ///
 /// | `Value` | `Color`               | `Range`              |
 /// |:-------:|:---------------------:|:--------------------:|
@@ -109,13 +110,15 @@ impl fmt::Display for LchValue {
     }
 }
 
-/// # XYZ
+/// # CIE 1931 XYZ
 ///
-/// | `Value` | `Color` | `Range`         |
-/// |:-------:|:-------:|:---------------:|
-/// | `X`     | `Red`   | `0.0 <---> 1.0` |
-/// | `Y`     | `Green` | `0.0 <---> 1.0` |
-/// | `Z`     | `Blue`  | `0.0 <---> 1.0` |
+/// Further Reading: [https://en.wikipedia.org/wiki/CIE_1931_color_space](https://en.wikipedia.org/wiki/CIE_1931_color_space)
+///
+/// | `Value` | `Color`     | `Range`         |
+/// |:-------:|:-----------:|:---------------:|
+/// | `X`     | `RGB`       | `0.0 <---> 1.0` |
+/// | `Y`     | `Luminance` | `0.0 <---> 1.0` |
+/// | `Z`     | `Blue`      | `0.0 <---> 1.0` |
 ///
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct XyzValue {
