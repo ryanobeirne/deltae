@@ -12,6 +12,7 @@ pub trait Delta: Into<LabValue> {
     /// let de  = lch.delta(xyz, DE1976);
     /// assert_eq!(de, 180.18364);
     /// ```
+    #[inline]
     fn delta<L: Into<LabValue>>(self, other: L, method: DEMethod) -> DeltaE {
         let reference: LabValue = self.into();
         let sample: LabValue = other.into();

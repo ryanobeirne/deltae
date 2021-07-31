@@ -13,36 +13,41 @@ fn round_to(val: f32, places: i32) -> f32 {
 }
 
 impl Round for DeltaE {
-    fn round_to(mut self, places: i32) -> Self {
-        self.value = round_to(self.value, places);
-        self
+    fn round_to(self, places: i32) -> Self {
+        Self {
+            value: round_to(self.value, places),
+            ..self
+        }
     }
 }
 
 impl Round for LabValue {
-    fn round_to(mut self, places: i32) -> LabValue {
-        self.l = round_to(self.l, places);
-        self.a = round_to(self.a, places);
-        self.b = round_to(self.b, places);
-        self
+    fn round_to(self, places: i32) -> LabValue {
+        Self {
+            l: round_to(self.l, places),
+            a: round_to(self.a, places),
+            b: round_to(self.b, places),
+        }
     }
 }
 
 impl Round for LchValue {
-    fn round_to(mut self, places: i32) -> LchValue {
-        self.l = round_to(self.l, places);
-        self.c = round_to(self.c, places);
-        self.h = round_to(self.h, places);
-        self
+    fn round_to(self, places: i32) -> LchValue {
+        Self {
+            l: round_to(self.l, places),
+            c: round_to(self.c, places),
+            h: round_to(self.h, places),
+        }
     }
 }
 
 impl Round for XyzValue {
-    fn round_to(mut self, places: i32) -> XyzValue {
-        self.x = round_to(self.x, places);
-        self.y = round_to(self.y, places);
-        self.z = round_to(self.z, places);
-        self
+    fn round_to(self, places: i32) -> XyzValue {
+        Self {
+            x: round_to(self.x, places),
+            y: round_to(self.y, places),
+            z: round_to(self.z, places),
+        }
     }
 }
 

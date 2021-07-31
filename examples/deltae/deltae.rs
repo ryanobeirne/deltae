@@ -20,7 +20,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         _ => unreachable!("COLORTYPE"),
     };
 
-    println!("{}: {}", delta.method, delta.value);
+    println!("{}: {}", delta.method(), delta.value());
 
     Ok(())
 }

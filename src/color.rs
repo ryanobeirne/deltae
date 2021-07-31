@@ -4,28 +4,22 @@
 //!
 //! ```
 //! use deltae::*;
-//! use std::str::FromStr;
-//! use std::error::Error;
 //!
-//! fn main() -> Result<(), Box<dyn Error>> {
-//!     let lab0 = LabValue::from_str("95.08, -0.17, -10.81")?;
-//!     let lch0 = LchValue {
-//!         l: 95.08,
-//!         c: 10.811337,
-//!         h: 269.09903,
-//!     };
+//! let lab0: LabValue = "95.08, -0.17, -10.81".parse().unwrap();
+//! let lch0 = LchValue {
+//!     l: 95.08,
+//!     c: 10.811337,
+//!     h: 269.09903,
+//! };
 //!
-//!     assert_eq!(lab0, lch0);
+//! assert!(lab0.delta_eq(&lch0, DE2000, 0.01));
 //!
-//!     let lch0 = LchValue::from(lab0);
-//!     let lab2 = LabValue::from(lch0);
+//! let lch0 = LchValue::from(lab0);
+//! let lab2 = LabValue::from(lch0);
 //!
-//!     println!("{}", lch0); // [L:89.73, c:7.2094, h:285.1157]
+//! println!("{}", lch0); // [L:89.73, c:7.2094, h:285.1157]
 //!
-//!     assert_eq!(lab0.round_to(4), lab2.round_to(4));
-//!
-//!     Ok(())
-//! }
+//! assert_eq!(lab0.round_to(4), lab2.round_to(4));
 //! ```
 
 use std::fmt;
@@ -36,13 +30,13 @@ use crate::validate::Validate;
 
 /// # CIEL\*a\*b\*
 ///
-/// | `Value` | `Color`               | `Range`          |
-/// |:-------:|:---------------------:|:----------------:|
-/// | `L*`    | `Light <---> Dark`    | `0 <---> 100`    |
-/// | `a*`    | `Green <---> Magenta` | `-128 <---> 128` |
-/// | `b*`    | `Blue  <---> Yellow`  | `-128 <---> 128` |
+/// | `Value` | `Color`               | `Range`              |
+/// |:-------:|:---------------------:|:--------------------:|
+/// | `L*`    | `Light <---> Dark`    | `0.0 <---> 100.0`    |
+/// | `a*`    | `Green <---> Magenta` | `-128.0 <---> 128.0` |
+/// | `b*`    | `Blue  <---> Yellow`  | `-128.0 <---> 128.0` |
 ///
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct LabValue {
     /// Lightness
     pub l: f32,
@@ -54,7 +48,7 @@ pub struct LabValue {
 
 impl LabValue {
     /// Returns a result of a LabValue from 3 `f32`s.
-    /// Will return `Err()` if the values are out of range
+    /// Will return `Err()` if the values are out of range as determined by the [`Validate`] trait.
     pub fn new(l: f32, a: f32, b: f32) -> ValueResult<LabValue> {
         LabValue {l, a, b}.validate()
     }
@@ -74,13 +68,13 @@ impl fmt::Display for LabValue {
 
 /// # Lch: Luminance, Chroma, Hue
 ///
-/// | `Value` | `Color`                    | `Range`            |
-/// |:-------:|:--------------------------:|:------------------:|
-/// | `L*`    | `Light <---> Dark`         | `0 <---> 100`      |
-/// | `c`     | `Chroma (Amount of color)` | `0 <---> 181.0139` |
-/// | `h`     | `Hue (Degrees)`            | `0 <---> 360°`     |
+/// | `Value` | `Color`                    | `Range`                |
+/// |:-------:|:--------------------------:|:----------------------:|
+/// | `L*`    | `Light <---> Dark`         | `0.0 <---> 100.0`      |
+/// | `c`     | `Chroma (Amount of color)` | `0.0 <---> 181.0139`   |
+/// | `h`     | `Hue (Degrees)`            | `0.0 <---> 360.0°`     |
 ///
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct LchValue {
     /// Lightness
     pub l: f32,
@@ -92,7 +86,7 @@ pub struct LchValue {
 
 impl LchValue {
     /// Returns a result of an LchValue from 3 `f32`s.
-    /// Will return `Err()` if the values are out of range
+    /// Will return `Err()` if the values are out of range as determined by the [`Validate`] trait.
     pub fn new(l: f32, c: f32, h: f32) -> ValueResult<LchValue> {
         LchValue { l, c, h }.validate()
     }
@@ -117,13 +111,13 @@ impl fmt::Display for LchValue {
 
 /// # XYZ
 ///
-/// | `Value` | `Color` | `Range`     |
-/// |:-------:|:-------:|:-----------:|
-/// | `X`     | `Red`   | `0 <---> 1` |
-/// | `Y`     | `Green` | `0 <---> 1` |
-/// | `Z`     | `Blue`  | `0 <---> 1` |
+/// | `Value` | `Color` | `Range`         |
+/// |:-------:|:-------:|:---------------:|
+/// | `X`     | `Red`   | `0.0 <---> 1.0` |
+/// | `Y`     | `Green` | `0.0 <---> 1.0` |
+/// | `Z`     | `Blue`  | `0.0 <---> 1.0` |
 ///
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct XyzValue {
     /// X Value
     pub x: f32,
@@ -135,7 +129,7 @@ pub struct XyzValue {
 
 impl XyzValue {
     /// Returns a result of an XyzValue from 3 `f32`s.
-    /// Will return `Err()` if the values are out of range
+    /// Will return `Err()` if the values are out of range as determined by the [`Validate`] trait.
     pub fn new(x: f32, y: f32, z:f32) -> ValueResult<XyzValue> {
         XyzValue {x, y, z}.validate()
     }
