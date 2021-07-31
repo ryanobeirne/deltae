@@ -81,8 +81,12 @@ pub(crate) type ValueResult<T> = Result<T, color::ValueError>;
 pub struct DeltaE {
     /// The mathematical method used for calculating color difference
     pub method: DEMethod,
-    /// The calculated value
+    /// The calculated Delta E value
     pub value: f32,
+    /// The reference color
+    reference: LabValue,
+    /// The sample color
+    sample: LabValue,
 }
 
 impl DeltaE {

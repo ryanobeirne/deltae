@@ -2,7 +2,7 @@ use super::*;
 
 /// Trait to determine color difference between various types.
 /// As long as the type can be converted to Lab, we can calculate DeltaE.
-pub trait Delta where Self: Into<LabValue> {
+pub trait Delta: Into<LabValue> {
     /// Calculate DeltaE between 2 types
     /// ```
     /// use deltae::*;
@@ -13,17 +13,17 @@ pub trait Delta where Self: Into<LabValue> {
     /// assert_eq!(de, 180.18364);
     /// ```
     fn delta<L: Into<LabValue>>(self, other: L, method: DEMethod) -> DeltaE {
-        let lab0: LabValue = self.into();
-        let lab1: LabValue = other.into();
+        let reference: LabValue = self.into();
+        let sample: LabValue = other.into();
         let value = match method {
-            DEMethod::DE1976 => delta_e_1976(&lab0, &lab1),
-            DEMethod::DE1994T => delta_e_1994(&lab0, &lab1, true),
-            DEMethod::DE1994G => delta_e_1994(&lab0, &lab1, false),
-            DEMethod::DE2000 => delta_e_2000(&lab0, &lab1),
-            DEMethod::DECMC(t_l, t_c) => delta_e_cmc(&lab0, &lab1, t_l, t_c),
+            DEMethod::DE1976 => delta_e_1976(&reference, &sample),
+            DEMethod::DE1994T => delta_e_1994(&reference, &sample, true),
+            DEMethod::DE1994G => delta_e_1994(&reference, &sample, false),
+            DEMethod::DE2000 => delta_e_2000(&reference, &sample),
+            DEMethod::DECMC(t_l, t_c) => delta_e_cmc(&reference, &sample, t_l, t_c),
         };
 
-        DeltaE { value, method }
+        DeltaE { value, method, reference, sample }
     }
 }
 
