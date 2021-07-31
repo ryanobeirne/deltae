@@ -168,7 +168,7 @@ impl fmt::Display for ValueError {
     }
 }
 
-impl Error for ValueError {
+impl ValueError {
     fn description(&self) -> &str {
         match self {
             ValueError::OutOfBounds => "Value is out of range!",
@@ -176,3 +176,5 @@ impl Error for ValueError {
         }
     }
 }
+
+impl Error for ValueError {}

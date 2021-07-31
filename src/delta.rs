@@ -47,7 +47,7 @@ fn delta_e_1994(lab_0: &LabValue, lab_1: &LabValue, textiles: bool) -> f32 {
     let delta_hue = (delta_a.powi(2) + delta_b.powi(2) - delta_chroma.powi(2)).sqrt();
 
     let (kl, k1, k2) = match textiles {
-        true  => (2.0, 0.048, 0.014),
+        true => (2.0, 0.048, 0.014),
         false => (1.0, 0.045, 0.015),
     };
 
@@ -55,10 +55,7 @@ fn delta_e_1994(lab_0: &LabValue, lab_1: &LabValue, textiles: bool) -> f32 {
     let s_c = 1.0 + k1 * chroma_0;
     let s_h = 1.0 + k2 * chroma_0;
 
-    (   (delta_l / kl * s_l).powi(2)
-      + (delta_chroma / s_c).powi(2)
-      + (delta_hue / s_h).powi(2)
-    ).sqrt()
+    ((delta_l / kl * s_l).powi(2) + (delta_chroma / s_c).powi(2) + (delta_hue / s_h).powi(2)).sqrt()
 }
 
 /// DeltaE 2000. This is a ridiculously complicated formula.
@@ -124,19 +121,17 @@ fn delta_e_2000(lab_0: &LabValue, lab_1: &LabValue) -> f32 {
     let k_c = 1.0;
     let k_h = 1.0;
 
-    let de2000 = (
+    (
         (delta_l_prime/(k_l*s_l)).powi(2)
       + (delta_c_prime/(k_c*s_c)).powi(2)
       + (delta_h_prime/(k_h*s_h)).powi(2)
       + (r_t * (delta_c_prime/(k_c*s_c)) * (delta_h_prime/(k_h*s_h)))
-    ).sqrt();
-
-    de2000
+    ).sqrt()
 }
 
 /// Custom weighted DeltaE formula
 #[inline]
-fn delta_e_cmc(lab0: &LabValue, lab1 :&LabValue, tolerance_l: f32, tolerance_c: f32) -> f32 {
+fn delta_e_cmc(lab0: &LabValue, lab1: &LabValue, tolerance_l: f32, tolerance_c: f32) -> f32 {
     let chroma_0 = (lab0.a.powi(2) + lab0.b.powi(2)).sqrt();
     let chroma_1 = (lab1.a.powi(2) + lab1.b.powi(2)).sqrt();
     let delta_c = chroma_0 - chroma_1;
@@ -157,15 +152,11 @@ fn delta_e_cmc(lab0: &LabValue, lab1 :&LabValue, tolerance_l: f32, tolerance_c: 
 
     let h = lab0.b.atan2(lab0.a).to_degrees();
 
-    let h_1 = if h >= 0.0 {
-        h
-    } else {
-        h + 360.0
-    };
+    let h_1 = if h >= 0.0 { h } else { h + 360.0 };
 
     let f = (chroma_0.powi(4) / (chroma_0.powi(4) + 1900.0)).sqrt();
 
-    let t = if 164.0 <= h_1 && h_1 <= 345.0 {
+    let t = if (164.0..345.0).contains(&h_1) {
         0.56 + (0.2 * (h_1 + 168.0).to_radians().cos()).abs()
     } else {
         0.36 + (0.4 * (h_1 + 35.0).to_radians().cos()).abs()
@@ -173,11 +164,10 @@ fn delta_e_cmc(lab0: &LabValue, lab1 :&LabValue, tolerance_l: f32, tolerance_c: 
 
     let s_h = s_c * (f * t + 1.0 - f);
 
-    let decmc = (
-        (delta_l / (tolerance_l * s_l)).powi(2) +
-        (delta_c / (tolerance_c * s_c)).powi(2) +
-        (delta_h / s_h).powi(2)
-    ).sqrt();
-
-    decmc
+    (
+        (delta_l / (tolerance_l * s_l)).powi(2)
+      + (delta_c / (tolerance_c * s_c)).powi(2)
+      + (delta_h / s_h).powi(2)
+    )
+    .sqrt()
 }

@@ -1,7 +1,7 @@
 [package]
 name = "deltae"
 version = "0.2.1"
-authors = ["Ryan O'Beirne <ryanobeirne@gmail.com>"]
+authors = ["Ryan O'Beirne <ryanobeirne@ryanobeirne.com>"]
 description = "Calculate Delta E between two colors in CIE Lab space."
 edition = "2018"
 license = "MIT"

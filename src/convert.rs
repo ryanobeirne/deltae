@@ -79,12 +79,6 @@ impl TryFrom<&(f32, f32, f32)> for LabValue {
 }
 
 // To Lch /////////////////////////////////////////////////////////////////////
-impl From<&LchValue> for LchValue {
-    fn from(lch: &LchValue) -> LchValue {
-        LchValue::from(*lch)
-    }
-}
-
 impl From<LabValue> for LchValue {
     fn from(lab: LabValue) -> LchValue {
         LchValue {
@@ -152,7 +146,7 @@ impl From<LabValue> for XyzValue {
         let fy = (lab.l + 16.0) / 116.0;
         let fx = (lab.a / 500.0) + fy;
         let fz = fy - (lab.b / 200.0);
-        let xr = if fx > CBRT_EPSILON {
+        let xr = if fx > CBRT_EPSILON as f32 {
             fx.powi(3)
         } else {
             ((fx * 116.0) - 16.0) / KAPPA
@@ -162,7 +156,7 @@ impl From<LabValue> for XyzValue {
         } else {
             lab.l / KAPPA
         };
-        let zr = if fz > CBRT_EPSILON {
+        let zr = if fz > CBRT_EPSILON as f32 {
             fz.powi(3)
         } else {
             ((fz * 116.0) - 16.0) / KAPPA
@@ -173,12 +167,6 @@ impl From<LabValue> for XyzValue {
             y: yr,
             z: zr * 0.8251,
         }
-    }
-}
-
-impl From<&XyzValue> for XyzValue {
-    fn from(xyz: &XyzValue) -> XyzValue {
-        XyzValue::from(*xyz)
     }
 }
 
@@ -293,7 +281,7 @@ impl FromStr for XyzValue {
 // Helper Functions ////////////////////////////////////////////////////////////
 const KAPPA: f32 = 24389.0 / 27.0; // CIE Standard: 903.3
 const EPSILON: f32 = 216.0 / 24389.0; // CIE Standard: 0.008856
-const CBRT_EPSILON: f32 = 0.20689655172413796;
+const CBRT_EPSILON: f64 = 0.20689655172413796;
 
 pub fn get_h_prime(a: f32, b: f32) -> f32 {
     let h_prime = b.atan2(a).to_degrees();
@@ -307,7 +295,7 @@ pub fn get_h_prime(a: f32, b: f32) -> f32 {
 // Validate and convert strings to `LabValue`.
 // Split string by comma (92.5,33.5,-18.8).
 fn parse_str_to_vecf32(s: &str, length: usize) -> ValueResult<Vec<f32>> {
-    let collection: Vec<&str> = s.split(",").collect();
+    let collection: Vec<&str> = s.split(',').collect();
 
     // Allow extraneous whitespace ("92.5, 33.5, -18.8")
     let mut v: Vec<&str> = Vec::new();
