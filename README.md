@@ -1,5 +1,11 @@
 # deltae
 
+[![Github](https://github.com/ryanobeirne/deltae/workflows/Rust/badge.svg)](https://github.com/ryanobeirne/deltae/actions)
+[![Gitlab](https://gitlab.com/ryanobeirne/deltae/badges/master/pipeline.svg?ignore_skipped=true)](https://gitlab.com/ryanobeirne/deltae/pipelines)
+[![Documentation](https://docs.rs/deltae/badge.svg)](https://docs.rs/deltae)
+[![Crates.io](https://img.shields.io/crates/v/deltae.svg)](https://crates.io/crates/deltae)
+[![License](https://img.shields.io/crates/l/deltae.svg)](https://github.com/ryanobeirne/deltae/blob/master/LICENSE)
+
 ## Library
 
 A rust library for converting colors and calculating
