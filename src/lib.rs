@@ -144,7 +144,7 @@ impl DeltaE {
         self.reference.delta(self.sample, method)
     }
 
-    /// Return a reference the [`DeltaE`] method used in the calculation
+    /// Return a reference to the [`DeltaE`] method used in the calculation
     pub fn method(&self) -> &DEMethod {
         &self.method
     }
@@ -199,8 +199,13 @@ impl PartialOrd for DeltaE {
 pub enum DEMethod{
     /// The default DeltaE method
     DE2000,
-    /// An implementation of DeltaE with tolerances for Lightness and Chroma
-    DECMC(f32, f32),
+    /// An implementation of DeltaE with separate tolerances for Lightness and Chroma
+    DECMC(
+        /// Lightness tolerance
+        f32,
+        /// Chroma tolerance
+        f32,
+    ),
     /// CIE94 DeltaE implementation, weighted with a tolerance for graphics
     DE1994G,
     /// CIE94 DeltaE implementation, weighted with a tolerance for textiles

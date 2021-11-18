@@ -10,13 +10,13 @@ homepage = "https://github.com/ryanobeirne/deltae"
 repository = "https://github.com/ryanobeirne/deltae.git"
 readme = "README.md"
 
-[[example]]
-name = "deltae"
-path = "examples/deltae/deltae.rs"
+# [[example]]
+# name = "deltae"
+# path = "examples/deltae/deltae.rs"
 
-[[example]]
-name = "readme"
-path = "examples/readme.rs"
+# [[example]]
+# name = "readme"
+# path = "examples/readme.rs"
 
 [dev-dependencies]
 clap = "2.32.0"
