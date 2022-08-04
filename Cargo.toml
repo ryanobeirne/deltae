@@ -9,6 +9,7 @@ documentation = "https://ryanobeirne.github.io/deltae"
 homepage = "https://github.com/ryanobeirne/deltae"
 repository = "https://github.com/ryanobeirne/deltae.git"
 readme = "README.md"
+include = ["src/**/*", "LICENSE", "README.md"]
 
 # [[example]]
 # name = "deltae"
